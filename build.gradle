@@ -25,6 +25,32 @@ ext {
 configure(allprojects) { project ->
 	apply plugin: "io.spring.dependency-management"
 
+	repositories {
+		maven {
+			name = 'nexus'
+			url = nexusPublicUrl
+			allowInsecureProtocol = true
+			credentials {
+				username = nexusUsername
+				password = nexusPassword
+			}
+		}
+		mavenLocal()
+		mavenCentral()
+		if (version.endsWith('-SNAPSHOT')) {
+			maven {
+				name = 'nexus'
+				url = nexusSnapshotUrl
+				allowInsecureProtocol = true
+				credentials {
+					username = nexusUsername
+					password = nexusPassword
+				}
+			}
+		}
+		maven { url "https://repo.spring.io/libs-spring-framework-build" }
+	}
+
 	dependencyManagement {
 		imports {
 			mavenBom "com.fasterxml.jackson:jackson-bom:2.12.7"
@@ -289,10 +315,6 @@ configure(allprojects) { project ->
 		resolutionStrategy {
 			cacheChangingModulesFor 0, "seconds"
 		}
-		repositories {
-			mavenCentral()
-			maven { url "https://repo.spring.io/libs-spring-framework-build" }
-		}
 	}
 	configurations.all {
 		resolutionStrategy {
@@ -433,6 +455,17 @@ configure(rootProject) {
 	}
 
 	publishing {
+		repositories {
+			maven {
+				name = 'nexus'
+				url = project.version.toString().endsWith('-SNAPSHOT') ? nexusSnapshotUrl : nexusReleaseUrl
+				allowInsecureProtocol = true
+				credentials {
+					username = nexusUsername
+					password = nexusPassword
+				}
+			}
+		}
 		publications {
 			mavenJava(MavenPublication) {
 				artifact docsZip

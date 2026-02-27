@@ -1,7 +1,28 @@
 pluginManagement {
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		gradlePluginPortal()
+		maven {
+			name = 'nexus'
+			url = nexusPublicUrl
+			allowInsecureProtocol = true
+			credentials {
+				username = nexusUsername
+				password = nexusPassword
+			}
+		}
+		if (version.endsWith('-SNAPSHOT')) {
+			maven {
+				name = 'nexus'
+				url = nexusSnapshotUrl
+				allowInsecureProtocol = true
+				credentials {
+					username = nexusUsername
+					password = nexusPassword
+				}
+			}
+		}
 		maven { url "https://repo.spring.io/release" }
 	}
 }

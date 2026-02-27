@@ -3,8 +3,18 @@ plugins {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 	gradlePluginPortal()
+	maven {
+		name = 'nexus'
+		url = nexusPublicUrl
+		allowInsecureProtocol = true
+		credentials {
+			username = nexusUsername
+			password = nexusPassword
+		}
+	}
 }
 
 dependencies {
