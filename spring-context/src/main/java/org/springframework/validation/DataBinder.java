@@ -483,7 +483,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 		else {
 			String[] fieldPatterns = new String[disallowedFields.length];
 			for (int i = 0; i < fieldPatterns.length; i++) {
-				fieldPatterns[i] = PropertyAccessorUtils.canonicalPropertyName(disallowedFields[i]).toLowerCase(Locale.ROOT);
+				fieldPatterns[i] = PropertyAccessorUtils.canonicalPropertyName(disallowedFields[i]);
 			}
 			this.disallowedFields = fieldPatterns;
 		}
@@ -826,7 +826,7 @@ public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 		String[] allowed = getAllowedFields();
 		String[] disallowed = getDisallowedFields();
 		return ((ObjectUtils.isEmpty(allowed) || PatternMatchUtils.simpleMatch(allowed, field)) &&
-				(ObjectUtils.isEmpty(disallowed) || !PatternMatchUtils.simpleMatch(disallowed, field.toLowerCase(Locale.ROOT))));
+				(ObjectUtils.isEmpty(disallowed) || !PatternMatchUtils.simpleMatchIgnoreCase(disallowed, field)));
 	}
 
 	/**

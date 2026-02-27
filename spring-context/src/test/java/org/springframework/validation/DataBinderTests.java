@@ -812,6 +812,24 @@ class DataBinderTests {
 		}
 	}
 
+	@Test
+	void bindingWithUnicodeDisallowedFields() throws BindException {
+		Map<String, String> target = new HashMap<>();
+		DataBinder binder = new DataBinder(target, "target");
+		// Sigma: Σ (upper), σ (lower), ς (lower finishing)
+		// We use Σ in disallowed list and try to bind with σ
+		binder.setDisallowedFields("ΣIGMA"); 
+		MutablePropertyValues pvs = new MutablePropertyValues();
+		pvs.add("σigma", "testValue");
+
+		binder.bind(pvs);
+		binder.close();
+		
+		// If working correctly, 'σigma' should be suppressed because ΣIGMA matches σigma
+		assertThat(target.get("σigma")).isNull();
+		assertThat(binder.getBindingResult().getSuppressedFields()).containsExactly("σigma");
+	}
+
 	/**
 	 * Tests for required field, both null, non-existing and empty strings.
 	 */

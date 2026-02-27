@@ -99,8 +99,29 @@ class PatternMatchUtilsTests {
 		doTest("**a", "ab", false);
 	}
 
+	@Test
+	void ignoreCase() {
+		doTestIgnoreCase("get*", "GETME", true);
+		doTestIgnoreCase("*Test", "getmetest", true);
+		doTestIgnoreCase("*stuff*", "GETSTUFFTEST", true);
+		doTestIgnoreCase("on*Event", "ONMYEVENT", true);
+	}
+
+	@Test
+	void unicode() {
+		// Greek Sigma
+		doTestIgnoreCase("ΣIGMA", "σigma", true);
+		doTestIgnoreCase("ΣIGMA", "ΣIGMA", true);
+		// Cyrillic
+		doTestIgnoreCase("ПРИВЕТ", "привет", true);
+	}
+
 	private void doTest(String pattern, String str, boolean shouldMatch) {
 		assertThat(PatternMatchUtils.simpleMatch(pattern, str)).isEqualTo(shouldMatch);
+	}
+
+	private void doTestIgnoreCase(String pattern, String str, boolean shouldMatch) {
+		assertThat(PatternMatchUtils.simpleMatchIgnoreCase(pattern, str)).isEqualTo(shouldMatch);
 	}
 
 }
