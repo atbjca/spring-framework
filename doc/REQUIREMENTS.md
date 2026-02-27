@@ -20,4 +20,8 @@
 项目遵循 Spring 官方的依赖管理规范，通过 `io.spring.dependency-management` 插件进行版本控制。
 
 ## 3. 发布指南
-发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。使用 `make deploy` 即可完成发布。
+发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。
+- **发布范围**:
+    - **部署组件**: 根项目 (`spring`)、BOM (`framework-bom`) 以及所有核心模块 (`spring-*`)。
+    - **不部署组件**: 内部测试模块 (`integration-tests`) 已被显式排除，不会上传至私服。
+- **配置实现**: 发布地址已全局化，所有子项目均会自动寻址到 Nexus 仓库。

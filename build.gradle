@@ -424,6 +424,26 @@ configure([rootProject] + javaProjects) { project ->
 	] as String[]
 }
 
+// 配置全局发布仓库，确保所有开启了 maven-publish 插件的项目（包括所有子项目）都能上传到 Nexus
+allprojects {
+	plugins.withType(MavenPublishPlugin).all {
+		publishing {
+			repositories {
+				maven {
+					name = 'nexus'
+					// 根据版本号自动选择 Snapshot 或 Release 仓库
+					url = project.version.toString().endsWith('-SNAPSHOT') ? nexusSnapshotUrl : nexusReleaseUrl
+					allowInsecureProtocol = true
+					credentials {
+						username = nexusUsername
+						password = nexusPassword
+					}
+				}
+			}
+		}
+	}
+}
+
 configure(moduleProjects) { project ->
 	apply from: "${rootDir}/gradle/spring-module.gradle"
 }
@@ -457,17 +477,6 @@ configure(rootProject) {
 	}
 
 	publishing {
-		repositories {
-			maven {
-				name = 'nexus'
-				url = project.version.toString().endsWith('-SNAPSHOT') ? nexusSnapshotUrl : nexusReleaseUrl
-				allowInsecureProtocol = true
-				credentials {
-					username = nexusUsername
-					password = nexusPassword
-				}
-			}
-		}
 		publications {
 			mavenJava(MavenPublication) {
 				artifact docsZip
@@ -476,5 +485,4 @@ configure(rootProject) {
 			}
 		}
 	}
-
 }
