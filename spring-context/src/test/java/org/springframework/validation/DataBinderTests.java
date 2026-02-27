@@ -789,6 +789,29 @@ class DataBinderTests {
 		assertThat(binder.getBindingResult().getSuppressedFields()).containsExactly("someMap[key3]", "someMap[key4]");
 	}
 
+	@Test
+	void bindingWithDisallowedFieldsAndTurkishLocale() throws BindException {
+		TestBean tb = new TestBean();
+		DataBinder binder = new DataBinder(tb);
+		// "JEDI" in Turkish toLowerCase() would be "jedı" (dotless i)
+		// We want to ensure it matches "jedi" consistently using Locale.ROOT
+		binder.setDisallowedFields("JEDI");
+		MutablePropertyValues pvs = new MutablePropertyValues();
+		pvs.add("jedi", "true");
+
+		Locale oldLocale = Locale.getDefault();
+		Locale.setDefault(new Locale("tr", "TR"));
+		try {
+			binder.bind(pvs);
+			binder.close();
+			assertThat(tb.isJedi()).as("did not change jedi").isFalse();
+			assertThat(binder.getBindingResult().getSuppressedFields()).containsExactly("jedi");
+		}
+		finally {
+			Locale.setDefault(oldLocale);
+		}
+	}
+
 	/**
 	 * Tests for required field, both null, non-existing and empty strings.
 	 */

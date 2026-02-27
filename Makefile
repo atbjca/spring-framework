@@ -23,12 +23,12 @@ build-thin: clean ## 编译打包（瘦身版）
 	./gradlew build -x test -x checkstyleMain -x checkstyleTest -x asciidoctor -x javadoc
 
 # 编译并安装到本地 Maven 仓库（跳过测试和耗时的文档生成）
-install: clean
-	./gradlew publishToMavenLocal -x test -x javadoc -x dokkaHtml -x asciidoctor
+install: 
+	./gradlew clean publishToMavenLocal -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoctor -x asciidoctorPdf -x api
 
 # 发布到 Nexus 私服（跳过测试和耗时的文档生成）
-deploy: clean
-	./gradlew publish -x test -x javadoc -x dokkaHtml -x asciidoctor
+deploy:
+	./gradlew clean publish -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoctor -x asciidoctorPdf -x api
 
 # 专门用于生成文档的命令（如果确实需要 API 文档时使用）
 docs: clean
