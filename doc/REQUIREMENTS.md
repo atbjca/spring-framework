@@ -19,7 +19,13 @@
 ## 2. 依赖管理
 项目遵循 Spring 官方的依赖管理规范，通过 `io.spring.dependency-management` 插件进行版本控制。
 
-## 3. 发布指南
+## 3. 安全与合规
+- [x] 配置项目全局 Group ID，支持通过 `gradle.properties` 一键修改。
+- [x] 优化构建命令，默认跳过 `javadoc` 等耗时文档生成任务。
+- [/] **漏洞修复流水线**: 正在按计划逐个修复识别出的 CVE 漏洞。
+    - **CVE-2024-38816**: 已完成代码修复并创建 [CVE-2024-38816.md](./CVE/CVE-2024-38816.md)。
+
+## 4. 发布指南
 发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。
 - **发布范围**:
     - **部署组件**: 根项目 (`spring`)、BOM (`framework-bom`) 以及所有核心模块 (`spring-*`)。

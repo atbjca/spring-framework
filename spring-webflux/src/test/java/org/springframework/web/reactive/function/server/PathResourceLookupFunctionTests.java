@@ -124,4 +124,39 @@ public class PathResourceLookupFunctionTests {
 				.verify();
 	}
 
+	@Test
+	public void pathTraversal() throws Exception {
+		File tempFile = File.createTempFile("test", ".txt");
+		tempFile.deleteOnExit();
+		File publicDir = new File(tempFile.getParentFile(), "public");
+		publicDir.mkdir();
+		File secretFile = new File(tempFile.getParentFile(), "secret.txt");
+		secretFile.createNewFile();
+
+		try {
+			org.springframework.core.io.FileSystemResource location = new org.springframework.core.io.FileSystemResource(publicDir.getAbsolutePath() + "/");
+			PathResourceLookupFunction function = new PathResourceLookupFunction("/resources/**", location);
+
+			// Attempt to access secret.txt via path traversal
+			MockServerHttpRequest mockRequest = MockServerHttpRequest.get("https://localhost/resources/../secret.txt").build();
+			ServerRequest request = new DefaultServerRequest(MockServerWebExchange.from(mockRequest), Collections.emptyList());
+			Mono<Resource> result = function.apply(request);
+			StepVerifier.create(result)
+					.expectComplete()
+					.verify();
+
+			// Attempt with encoded path traversal
+			MockServerHttpRequest mockRequestEncoded = MockServerHttpRequest.get("https://localhost/resources/..%2fsecret.txt").build();
+			ServerRequest requestEncoded = new DefaultServerRequest(MockServerWebExchange.from(mockRequestEncoded), Collections.emptyList());
+			Mono<Resource> resultEncoded = function.apply(requestEncoded);
+			StepVerifier.create(resultEncoded)
+					.expectComplete()
+					.verify();
+		}
+		finally {
+			secretFile.delete();
+			publicDir.delete();
+		}
+	}
+
 }

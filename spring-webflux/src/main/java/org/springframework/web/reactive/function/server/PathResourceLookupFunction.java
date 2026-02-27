@@ -24,6 +24,7 @@ import java.util.function.Function;
 import reactor.core.publisher.Mono;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.server.PathContainer;
@@ -132,6 +133,10 @@ class PathResourceLookupFunction implements Function<ServerRequest, Mono<Resourc
 		else if (resource instanceof ClassPathResource) {
 			resourcePath = ((ClassPathResource) resource).getPath();
 			locationPath = StringUtils.cleanPath(((ClassPathResource) this.location).getPath());
+		}
+		else if (resource instanceof FileSystemResource) {
+			resourcePath = StringUtils.cleanPath(((FileSystemResource) resource).getPath());
+			locationPath = StringUtils.cleanPath(((FileSystemResource) this.location).getPath());
 		}
 		else {
 			resourcePath = resource.getURL().getPath();

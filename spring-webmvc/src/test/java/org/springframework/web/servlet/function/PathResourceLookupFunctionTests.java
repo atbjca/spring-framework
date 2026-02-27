@@ -96,6 +96,35 @@ class PathResourceLookupFunctionTests {
 		assertThat(result.get().getFile()).isEqualTo(defaultResource.getFile());
 	}
 
+	@Test
+	void pathTraversal() throws Exception {
+		File tempFile = File.createTempFile("test", ".txt");
+		tempFile.deleteOnExit();
+		File publicDir = new File(tempFile.getParentFile(), "public");
+		publicDir.mkdir();
+		File secretFile = new File(tempFile.getParentFile(), "secret.txt");
+		secretFile.createNewFile();
+
+		try {
+			org.springframework.core.io.FileSystemResource location = new org.springframework.core.io.FileSystemResource(publicDir.getAbsolutePath() + "/");
+			PathResourceLookupFunction function = new PathResourceLookupFunction("/resources/**", location);
+
+			// Attempt to access secret.txt via path traversal
+			ServerRequest request = initRequest("GET", "/resources/../secret.txt");
+			Optional<Resource> result = function.apply(request);
+			assertThat(result.isPresent()).isFalse();
+
+			// Attempt with encoded path traversal
+			ServerRequest requestEncoded = initRequest("GET", "/resources/..%2fsecret.txt");
+			Optional<Resource> resultEncoded = function.apply(requestEncoded);
+			assertThat(resultEncoded.isPresent()).isFalse();
+		}
+		finally {
+			secretFile.delete();
+			publicDir.delete();
+		}
+	}
+
 	private ServerRequest initRequest(String httpMethod, String requestUri) {
 		return new DefaultServerRequest(
 				PathPatternsTestUtils.initRequest(httpMethod, requestUri, true),
