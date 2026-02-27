@@ -26,6 +26,8 @@ configure(allprojects) { project ->
 	apply plugin: "io.spring.dependency-management"
 
 	repositories {
+		mavenLocal()
+		mavenCentral()
 		maven {
 			name = 'nexus'
 			url = nexusPublicUrl
@@ -35,8 +37,6 @@ configure(allprojects) { project ->
 				password = nexusPassword
 			}
 		}
-		mavenLocal()
-		mavenCentral()
 		if (version.endsWith('-SNAPSHOT')) {
 			maven {
 				name = 'nexus'
@@ -325,7 +325,9 @@ configure(allprojects) { project ->
 }
 
 configure([rootProject] + javaProjects) { project ->
-	group = "org.springframework"
+	// 设置项目组 ID，此处引用了 gradle.properties 中定义的 projectGroup 变量
+	// 方便后续一键修改全局 Group ID (例如改为 cn.bjca.footstone)
+	group = projectGroup
 
 	apply plugin: "java"
 	apply plugin: "java-test-fixtures"
