@@ -818,4 +818,50 @@ class AnnotationsScannerTests {
 		void method(T argument);
 	}
 
+	/**
+	 * 测试 CVE-2025-41249 修复：
+	 * 验证在含有未绑定泛型类型参数的接口层级中，方法覆盖关系能被正确识别，
+	 * 进而保证父接口上的注解（如安全注解）不会被漏扫。
+	 *
+	 * <p>场景：GenericInterface&lt;A, B&gt;（未绑定泛型）的实现类实现了接口方法，
+	 * 修复前 resolve() 返回 null 导致覆盖关系无法识别，接口注解被跳过。
+	 * 修复后 toClass() 回退为 Object.class，覆盖识别正常，注解能被扫描到。
+	 */
+	@Test
+	void typeHierarchyStrategyOnMethodWithUnboundGenericParamScansAnnotations() {
+		// 验证含有完全未绑定泛型（无 extends 约束）的接口方法注解能被正确扫描
+		Method processOne = ReflectionUtils.findMethod(UnboundGenericImpl.class, "processOne", Long.class);
+		assertThat(scan(processOne, SearchStrategy.TYPE_HIERARCHY))
+				.as("来自泛型接口 GenericBound<A,B> 的 @TestAnnotation2 注解应被扫描到")
+				.contains("1:TestAnnotation2");
+
+		Method processTwo = ReflectionUtils.findMethod(UnboundGenericImpl.class, "processTwo", Long.class);
+		assertThat(scan(processTwo, SearchStrategy.TYPE_HIERARCHY))
+				.as("来自泛型接口 GenericBound<A,B> 的 @TestAnnotation3 注解应被扫描到")
+				.contains("1:TestAnnotation3");
+	}
+
+	// CVE-2025-41249 测试辅助类：含有完全未绑定泛型参数的接口
+	interface GenericBoundInterface<A, B> {
+
+		@TestAnnotation2
+		void processOne(A value);
+
+		@TestAnnotation3
+		void processTwo(A value);
+	}
+
+	static class UnboundGenericImpl implements GenericBoundInterface<Long, String> {
+
+		@Override
+		@TestAnnotation1
+		public void processOne(Long value) {
+		}
+
+		@Override
+		@TestAnnotation1
+		public void processTwo(Long value) {
+		}
+	}
+
 }

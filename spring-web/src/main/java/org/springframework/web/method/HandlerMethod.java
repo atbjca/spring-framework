@@ -415,8 +415,16 @@ public class HandlerMethod {
 			return true;
 		}
 		for (int i = 0; i < paramTypes.length; i++) {
+			// 安全修复 (CVE-2025-41249)：
+			// 使用 toClass() 替代 resolve()，以解决接口泛型参数导致的方法覆盖检测失败问题。
+			// 当 HandlerMethod 从接口合并参数注解时（getInterfaceParameterAnnotations），
+			// 如果接口方法含有未解析的泛型类型参数（如 GenericInterface<A, B> 中的 A），
+			// resolve() 无法解析该泛型变量并返回 null，导致 isOverrideFor 返回 false，
+			// 接口上的参数注解（包括 @Valid、@Max 等校验注解）将被忽略，
+			// 进而可能造成 Spring Security 或 Bean Validation 的安全校验失效。
+			// toClass() 在类型无法解析时安全回退为 Object.class，保证覆盖检测逻辑的正确性。
 			if (paramTypes[i] !=
-					ResolvableType.forMethodParameter(candidate, i, this.method.getDeclaringClass()).resolve()) {
+					ResolvableType.forMethodParameter(candidate, i, this.method.getDeclaringClass()).toClass()) {
 				return false;
 			}
 		}

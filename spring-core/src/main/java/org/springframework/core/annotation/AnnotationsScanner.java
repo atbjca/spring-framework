@@ -385,8 +385,17 @@ abstract class AnnotationsScanner {
 			return false;
 		}
 		for (int i = 0; i < rootParameterTypes.length; i++) {
+			// 安全修复 (CVE-2025-41249)：
+			// 使用 toClass() 而非 resolve()。
+			// 当方法所在的泛型父类/接口含有未绑定的类型变量（如 GenericInterface<A, B>）时，
+			// resolve() 无法解析该类型变量，返回 null。
+			// 这会导致参数类型比对失败，方法覆盖关系无法被识别，
+			// 进而使注解扫描跳过父类方法上的安全注解（如 @PreAuthorize），
+			// 最终可能造成 Spring Security 方法级安全校验被绕过。
+			// toClass() 在类型变量无法解析时安全地回退为 Object.class，
+			// 确保方法覆盖检测在泛型类型层级中能正常工作。
 			Class<?> resolvedParameterType = ResolvableType.forMethodParameter(
-					candidateMethod, i, sourceDeclaringClass).resolve();
+					candidateMethod, i, sourceDeclaringClass).toClass();
 			if (rootParameterTypes[i] != resolvedParameterType) {
 				return false;
 			}
