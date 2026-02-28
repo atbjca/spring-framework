@@ -45,14 +45,12 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 
 	private final Resource location;
 
-
 	public PathResourceLookupFunction(String pattern, Resource location) {
 		Assert.hasLength(pattern, "'pattern' must not be empty");
 		Assert.notNull(location, "'location' must not be null");
 		this.pattern = PathPatternParser.defaultInstance.parse(pattern);
 		this.location = location;
 	}
-
 
 	@Override
 	public Optional<Resource> apply(ServerRequest request) {
@@ -74,12 +72,10 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 			Resource resource = this.location.createRelative(path);
 			if (resource.isReadable() && isResourceUnderLocation(resource)) {
 				return Optional.of(resource);
-			}
-			else {
+			} else {
 				return Optional.empty();
 			}
-		}
-		catch (IOException ex) {
+		} catch (IOException ex) {
 			throw new UncheckedIOException(ex);
 		}
 	}
@@ -89,16 +85,37 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
 				slash = true;
-			}
-			else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
+			} else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
 				if (i == 0 || (i == 1 && slash)) {
-					return path;
+					return normalizePath(path);
 				}
 				path = slash ? "/" + path.substring(i) : path.substring(i);
-				return path;
+				return normalizePath(path);
 			}
 		}
 		return (slash ? "/" : "");
+	}
+
+	private static String normalizePath(String path) {
+		String result = path;
+		if (result.contains("%")) {
+			result = decode(result);
+			if (result.contains("%")) {
+				result = decode(result);
+			}
+			if (result.contains("../")) {
+				return StringUtils.cleanPath(result);
+			}
+		}
+		return path;
+	}
+
+	private static String decode(String path) {
+		try {
+			return java.net.URLDecoder.decode(path, "UTF-8");
+		} catch (Exception ex) {
+			return "";
+		}
 	}
 
 	private boolean isInvalidPath(String path) {
@@ -111,7 +128,7 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 				return true;
 			}
 		}
-		return path.contains("..") && StringUtils.cleanPath(path).contains("../");
+		return path.contains("../");
 	}
 
 	private boolean isResourceUnderLocation(Resource resource) throws IOException {
@@ -125,16 +142,13 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 		if (resource instanceof UrlResource) {
 			resourcePath = resource.getURL().toExternalForm();
 			locationPath = StringUtils.cleanPath(this.location.getURL().toString());
-		}
-		else if (resource instanceof ClassPathResource) {
+		} else if (resource instanceof ClassPathResource) {
 			resourcePath = ((ClassPathResource) resource).getPath();
 			locationPath = StringUtils.cleanPath(((ClassPathResource) this.location).getPath());
-		}
-		else if (resource instanceof FileSystemResource) {
+		} else if (resource instanceof FileSystemResource) {
 			resourcePath = StringUtils.cleanPath(((FileSystemResource) resource).getPath());
 			locationPath = StringUtils.cleanPath(((FileSystemResource) this.location).getPath());
-		}
-		else {
+		} else {
 			resourcePath = resource.getURL().getPath();
 			locationPath = StringUtils.cleanPath(this.location.getURL().getPath());
 		}
@@ -149,7 +163,6 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 		return !resourcePath.contains("%") ||
 				!StringUtils.uriDecode(resourcePath, StandardCharsets.UTF_8).contains("../");
 	}
-
 
 	@Override
 	public String toString() {
