@@ -809,4 +809,39 @@ class StringUtilsTests {
 		assertThat(StringUtils.truncate(text, 10)).isEqualTo(truncated);
 	}
 
+	/**
+	 * CVE-2025-41242 专项测试：
+	 * 验证 uriDecode 的修复后行为——仅对 %-encoded 序列进行字节解码，
+	 * 其他非编码字符直接传递，不经过字节流转换。
+	 */
+	@Test
+	void uriDecodeOnlyDecodesPercentEncodedSequences() {
+		// 基本单字节解码
+		assertThat(StringUtils.uriDecode("Hello%20World", java.nio.charset.StandardCharsets.UTF_8))
+				.isEqualTo("Hello World");
+
+		// 未编码字符应原样返回（不变场景返回原字符串引用）
+		String plain = "HelloWorld";
+		assertThat(StringUtils.uriDecode(plain, java.nio.charset.StandardCharsets.UTF_8))
+				.isSameAs(plain);
+
+		// 多字节 UTF-8 字符：中文"春"的编码是 %E6%98%A5
+		assertThat(StringUtils.uriDecode("%E6%98%A5", java.nio.charset.StandardCharsets.UTF_8))
+				.isEqualTo("\u6625");
+
+		// 混合内容：普通字符 + 编码字符（%20 = 空格）
+		assertThat(StringUtils.uriDecode("hello%20world.txt", java.nio.charset.StandardCharsets.UTF_8))
+				.isEqualTo("hello world.txt");
+
+		// 无效编码序列应抛出异常
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> StringUtils.uriDecode("%GG", java.nio.charset.StandardCharsets.UTF_8))
+				.withMessageContaining("Invalid encoded sequence");
+
+		// 不完整编码序列应抛出异常
+		assertThatIllegalArgumentException()
+				.isThrownBy(() -> StringUtils.uriDecode("%2", java.nio.charset.StandardCharsets.UTF_8))
+				.withMessageContaining("Invalid encoded sequence");
+	}
+
 }

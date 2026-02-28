@@ -27,6 +27,7 @@
     - **CVE-2024-38820**: 已完成代码修复并创建 [CVE-2024-38820.md](./CVE/CVE-2024-38820.md)。
     - **CVE-2025-22233**: 已完成代码修复（引入 `PatternMatchUtils.simpleMatchIgnoreCase`）并创建 [CVE-2025-22233.md](./CVE/CVE-2025-22233.md)。
     - **CVE-2025-41249**: 已完成代码修复（`resolve()` → `toClass()`）并创建 [CVE-2025-41249.md](./CVE/CVE-2025-41249.md)。
+    - **CVE-2025-41242**: 已完成代码修复（重构 `StringUtils.uriDecode`）并创建 [CVE-2025-41242.md](./CVE/CVE-2025-41242.md)。
 
 ## 4. 发布指南
 发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。

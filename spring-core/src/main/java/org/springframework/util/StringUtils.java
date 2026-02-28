@@ -783,6 +783,13 @@ public abstract class StringUtils {
 	 * <li>A sequence "{@code %<i>xy</i>}" is interpreted as a hexadecimal representation of the character.</li>
 	 * <li>For all other characters (including those already decoded), the output is undefined.</li>
 	 * </ul>
+	 *
+	 * <p>安全说明（CVE-2025-41242）：
+	 * 原实现使用 {@link java.io.ByteArrayOutputStream}，将所有字符（包括非 %-encoded 字符）
+	 * 写入字节流后再按字符集解码，在某些不合规的 Servlet 容器环境中可能导致路径穿越风险。
+	 * 重构后的实现仅对连续的 %-encoded 字节序列执行字节解码，其余 ASCII 字符直接追加到
+	 * {@link StringBuilder}，行为更精确、更安全。
+	 *
 	 * @param source the encoded String
 	 * @param charset the character set
 	 * @return the decoded value
@@ -797,10 +804,17 @@ public abstract class StringUtils {
 		}
 		Assert.notNull(charset, "Charset must not be null");
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(length);
+		// 安全修复 (CVE-2025-41242)：
+		// 使用 StringBuilder 替代 ByteArrayOutputStream，仅对 %-encoded 序列执行字节解码。
+		// 原实现将所有字符（无论是否经过 % 编码）都写入 ByteArrayOutputStream，
+		// 再作为完整字节序列按 charset 解码，导致在某些 Servlet 容器中可通过构造特殊的
+		// 编码序列绕过路径检查，造成路径穿越攻击（Path Traversal）。
+		// 新实现只对连续的 %-encoded 字节收集到临时字节数组后一次性解码，
+		// 其他普通 ASCII 字符则直接追加到 StringBuilder，行为精确且符合 RFC 3986。
+		StringBuilder result = new StringBuilder(length);
 		boolean changed = false;
 		for (int i = 0; i < length; i++) {
-			int ch = source.charAt(i);
+			char ch = source.charAt(i);
 			if (ch == '%') {
 				if (i + 2 < length) {
 					char hex1 = source.charAt(i + 1);
@@ -810,8 +824,31 @@ public abstract class StringUtils {
 					if (u == -1 || l == -1) {
 						throw new IllegalArgumentException("Invalid encoded sequence \"" + source.substring(i) + "\"");
 					}
-					baos.write((char) ((u << 4) + l));
-					i += 2;
+					// 收集连续的 %-encoded 字节序列，一次性解码为字符串
+					int start = i;
+					byte[] bytes = null;
+					int bytesCount = 0;
+					while (i < length && source.charAt(i) == '%') {
+						if (i + 2 < length) {
+							hex1 = source.charAt(i + 1);
+							hex2 = source.charAt(i + 2);
+							u = Character.digit(hex1, 16);
+							l = Character.digit(hex2, 16);
+							if (u == -1 || l == -1) {
+								throw new IllegalArgumentException("Invalid encoded sequence \"" + source.substring(i) + "\"");
+							}
+							if (bytes == null) {
+								bytes = new byte[(length - i) / 3];
+							}
+							bytes[bytesCount++] = (byte) ((u << 4) + l);
+							i += 3;
+						}
+						else {
+							throw new IllegalArgumentException("Invalid encoded sequence \"" + source.substring(i) + "\"");
+						}
+					}
+					i--; // 补偿外循环的 i++
+					result.append(new String(bytes, 0, bytesCount, charset));
 					changed = true;
 				}
 				else {
@@ -819,10 +856,11 @@ public abstract class StringUtils {
 				}
 			}
 			else {
-				baos.write(ch);
+				// 非编码字符直接追加，不经过字节解码流程
+				result.append(ch);
 			}
 		}
-		return (changed ? StreamUtils.copyToString(baos, charset) : source);
+		return (changed ? result.toString() : source);
 	}
 
 	/**
