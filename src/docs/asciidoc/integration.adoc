@@ -1005,7 +1005,6 @@ and https://openjdk.java.net/jeps/290.
 Setting up the HTTP invoker infrastructure for a service object closely resembles the
 way you would do the same by using Hessian. As Hessian support provides
 `HessianServiceExporter`, Spring's HttpInvoker support provides
-`org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter`.
 
 To expose the `AccountService` (mentioned earlier) within a Spring Web MVC
 `DispatcherServlet`, the following configuration needs to be in place in the
@@ -1013,7 +1012,6 @@ dispatcher's application context, as the following example shows:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
-	<bean name="/AccountService" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
 		<property name="service" ref="accountService"/>
 		<property name="serviceInterface" value="example.AccountService"/>
 	</bean>
@@ -1027,7 +1025,6 @@ Alternatively, you can create an `HttpInvokerServiceExporter` in your root appli
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
-	<bean name="accountExporter" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
 		<property name="service" ref="accountService"/>
 		<property name="serviceInterface" value="example.AccountService"/>
 	</bean>
@@ -1060,7 +1057,6 @@ shows how to configure this arrangement:
 
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
-	<bean id="httpInvokerProxy" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
 		<property name="serviceUrl" value="https://remotehost:8080/remoting/AccountService"/>
 		<property name="serviceInterface" value="example.AccountService"/>
 	</bean>
@@ -1074,7 +1070,6 @@ The following example shows how to do so:
 [source,xml,indent=0,subs="verbatim,quotes"]
 ----
 	<property name="httpInvokerRequestExecutor">
-		<bean class="org.springframework.remoting.httpinvoker.HttpComponentsHttpInvokerRequestExecutor"/>
 	</property>
 ----
 

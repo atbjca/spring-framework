@@ -56,7 +56,6 @@ import org.springframework.util.Assert;
  * @see java.rmi.RemoteException
  * @see org.springframework.remoting.RemoteAccessException
  * @see org.springframework.remoting.caucho.HessianProxyFactoryBean
- * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
  * @deprecated as of 5.3 (phasing out serialization-based remoting)
  */
 @Deprecated

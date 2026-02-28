@@ -44,8 +44,6 @@ import org.springframework.util.ClassUtils;
  * @see RemoteInvocationExecutor
  * @see org.springframework.remoting.rmi.RmiProxyFactoryBean
  * @see org.springframework.remoting.rmi.RmiServiceExporter
- * @see org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean
- * @see org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter
  */
 public class RemoteInvocation implements Serializable {
 
