@@ -25,6 +25,12 @@
 - [x] **漏洞修复流水线**: 已完成全部识别出的 CVE 漏洞排查与修复。
     - **CVE-2024-38816**: 已完成代码修复并创建 [CVE-2024-38816.md](./CVE/CVE-2024-38816.md)。
     - **CVE-2024-38820**: 已完成代码修复并创建 [CVE-2024-38820.md](./CVE/CVE-2024-38820.md)。
+ - [x] Phase 3: 已确认 5.3.39 基线已包含以下漏洞修复，并建立审计文档：
+    - [x] **CVE-2024-38808**: [CVE-2024-38808.md](./CVE/CVE-2024-38808.md) (SpEL DoS)
+    - [x] **CVE-2024-22262**: [CVE-2024-22262.md](./CVE/CVE-2024-22262.md) (UriComponentsBuilder 绕过)
+    - [x] **CVE-2024-22243**: [CVE-2024-22243.md](./CVE/CVE-2024-22243.md) (UriComponentsBuilder 绕过)
+    - [x] **CVE-2024-22259**: [CVE-2024-22259.md](./CVE/CVE-2024-22259.md) (UriComponentsBuilder 绕过)
+    - [x] **CVE-2024-38809**: [CVE-2024-38809.md](./CVE/CVE-2024-38809.md) (ETag DoS)
     - **CVE-2025-22233**: 已完成代码修复（引入 `PatternMatchUtils.simpleMatchIgnoreCase`）并创建 [CVE-2025-22233.md](./CVE/CVE-2025-22233.md)。
     - **CVE-2025-41249**: 已完成代码修复（`resolve()` → `toClass()`）并创建 [CVE-2025-41249.md](./CVE/CVE-2025-41249.md)。
     - **CVE-2025-41242**: 已完成代码修复（重构 `StringUtils.uriDecode`）并创建 [CVE-2025-41242.md](./CVE/CVE-2025-41242.md)。
