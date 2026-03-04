@@ -22,6 +22,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,18 +34,22 @@ import org.springframework.lang.Nullable;
  * configure how Spring test configuration annotations are processed within
  * enclosing class hierarchies (i.e., for <em>inner</em> test classes).
  *
- * <p>If {@code @NestedTestConfiguration} is not <em>present</em> or
+ * <p>
+ * If {@code @NestedTestConfiguration} is not <em>present</em> or
  * <em>meta-present</em> on a test class, in its supertype hierarchy, or in its
- * enclosing class hierarchy, the default <em>enclosing configuration inheritance
+ * enclosing class hierarchy, the default <em>enclosing configuration
+ * inheritance
  * mode</em> will be used. A {@code @NestedTestConfiguration} declaration on an
  * enclosing class for a nested interface will be ignored when searching for the
  * annotation on classes that implement the interface. See
  * {@link #ENCLOSING_CONFIGURATION_PROPERTY_NAME} for details on how to change
  * the default mode.
  *
- * <p>When the {@link EnclosingConfiguration#INHERIT INHERIT} mode is in use,
+ * <p>
+ * When the {@link EnclosingConfiguration#INHERIT INHERIT} mode is in use,
  * configuration from an enclosing test class will be inherited by inner test
- * classes, analogous to the semantics within a test class inheritance hierarchy.
+ * classes, analogous to the semantics within a test class inheritance
+ * hierarchy.
  * When the {@link EnclosingConfiguration#OVERRIDE OVERRIDE} mode is in use,
  * inner test classes will have to declare their own Spring test configuration
  * annotations. If you wish to explicitly configure the mode, annotate either
@@ -55,16 +60,20 @@ import org.springframework.lang.Nullable;
  * there is no need to redeclare the annotation unless you wish to switch the
  * mode.
  *
- * <p>This annotation may be used as a <em>meta-annotation</em> to create custom
+ * <p>
+ * This annotation may be used as a <em>meta-annotation</em> to create custom
  * <em>composed annotations</em>.
  *
- * <p>As of Spring Framework 5.3, the use of this annotation typically only makes
+ * <p>
+ * As of Spring Framework 5.3, the use of this annotation typically only makes
  * sense in conjunction with {@link org.junit.jupiter.api.Nested @Nested} test
  * classes in JUnit Jupiter; however, there may be other testing frameworks with
  * support for nested test classes that could also make use of this annotation.
  *
  * <h3>Supported Annotations</h3>
- * <p>The <em>Spring TestContext Framework</em> honors {@code @NestedTestConfiguration}
+ * <p>
+ * The <em>Spring TestContext Framework</em> honors
+ * {@code @NestedTestConfiguration}
  * semantics for the following annotations.
  * <ul>
  * <li>{@link BootstrapWith @BootstrapWith}</li>
@@ -99,33 +108,40 @@ public @interface NestedTestConfiguration {
 	/**
 	 * JVM system property used to change the default <em>enclosing configuration
 	 * inheritance mode</em>: {@value #ENCLOSING_CONFIGURATION_PROPERTY_NAME}.
-	 * <p>Supported values include enum constants defined in
+	 * <p>
+	 * Supported values include enum constants defined in
 	 * {@link EnclosingConfiguration}, ignoring case. For example, the default
 	 * may be changed to {@link EnclosingConfiguration#OVERRIDE} by supplying
 	 * the following JVM system property via the command line.
-	 * <pre style="code">-Dspring.test.enclosing.configuration=override</pre>
-	 * <p>If the property is not set to {@code OVERRIDE}, test configuration for
+	 * 
+	 * <pre style="code">
+	 * -Dspring.test.enclosing.configuration=override
+	 * </pre>
+	 * <p>
+	 * If the property is not set to {@code OVERRIDE}, test configuration for
 	 * an inner test class will be <em>inherited</em> according to
 	 * {@link EnclosingConfiguration#INHERIT} semantics by default.
-	 * <p>May alternatively be configured via the
+	 * <p>
+	 * May alternatively be configured via the
 	 * {@link org.springframework.core.SpringProperties SpringProperties}
 	 * mechanism.
+	 * 
 	 * @see #value
 	 */
 	String ENCLOSING_CONFIGURATION_PROPERTY_NAME = "spring.test.enclosing.configuration";
 
-
 	/**
 	 * Configures the {@link EnclosingConfiguration} mode.
+	 * 
 	 * @see EnclosingConfiguration#INHERIT
 	 * @see EnclosingConfiguration#OVERRIDE
 	 */
 	EnclosingConfiguration value();
 
-
 	/**
 	 * Enumeration of <em>modes</em> that dictate how test configuration from
 	 * enclosing classes is processed for inner test classes.
+	 * 
 	 * @see #INHERIT
 	 * @see #OVERRIDE
 	 */
@@ -145,10 +161,10 @@ public @interface NestedTestConfiguration {
 		 */
 		OVERRIDE;
 
-
 		/**
 		 * Get the {@code EnclosingConfiguration} enum constant with the supplied
 		 * name, ignoring case.
+		 * 
 		 * @param name the name of the enum constant to retrieve
 		 * @return the corresponding enum constant or {@code null} if not found
 		 * @see EnclosingConfiguration#valueOf(String)
@@ -159,14 +175,13 @@ public @interface NestedTestConfiguration {
 				return null;
 			}
 			try {
-				return EnclosingConfiguration.valueOf(name.trim().toUpperCase());
-			}
-			catch (IllegalArgumentException ex) {
+				return EnclosingConfiguration.valueOf(name.trim().toUpperCase(Locale.ROOT));
+			} catch (IllegalArgumentException ex) {
 				Log logger = LogFactory.getLog(EnclosingConfiguration.class);
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format(
-						"Failed to parse enclosing configuration mode from '%s': %s",
-						name, ex.getMessage()));
+							"Failed to parse enclosing configuration mode from '%s': %s",
+							name, ex.getMessage()));
 				}
 				return null;
 			}

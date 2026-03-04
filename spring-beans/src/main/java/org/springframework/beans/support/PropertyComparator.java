@@ -19,6 +19,7 @@ package org.springframework.beans.support;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,9 +45,9 @@ public class PropertyComparator<T> implements Comparator<T> {
 
 	private final SortDefinition sortDefinition;
 
-
 	/**
 	 * Create a new PropertyComparator for the given SortDefinition.
+	 * 
 	 * @see MutableSortDefinition
 	 */
 	public PropertyComparator(SortDefinition sortDefinition) {
@@ -55,9 +56,11 @@ public class PropertyComparator<T> implements Comparator<T> {
 
 	/**
 	 * Create a PropertyComparator for the given settings.
-	 * @param property the property to compare
-	 * @param ignoreCase whether upper and lower case in String values should be ignored
-	 * @param ascending whether to sort ascending (true) or descending (false)
+	 * 
+	 * @param property   the property to compare
+	 * @param ignoreCase whether upper and lower case in String values should be
+	 *                   ignored
+	 * @param ascending  whether to sort ascending (true) or descending (false)
 	 */
 	public PropertyComparator(String property, boolean ignoreCase, boolean ascending) {
 		this.sortDefinition = new MutableSortDefinition(property, ignoreCase, ascending);
@@ -70,15 +73,14 @@ public class PropertyComparator<T> implements Comparator<T> {
 		return this.sortDefinition;
 	}
 
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public int compare(T o1, T o2) {
 		Object v1 = getPropertyValue(o1);
 		Object v2 = getPropertyValue(o2);
 		if (this.sortDefinition.isIgnoreCase() && (v1 instanceof String) && (v2 instanceof String)) {
-			v1 = ((String) v1).toLowerCase();
-			v2 = ((String) v2).toLowerCase();
+			v1 = ((String) v1).toLowerCase(Locale.ROOT);
+			v2 = ((String) v2).toLowerCase(Locale.ROOT);
 		}
 
 		int result;
@@ -87,12 +89,10 @@ public class PropertyComparator<T> implements Comparator<T> {
 		try {
 			if (v1 != null) {
 				result = (v2 != null ? ((Comparable<Object>) v1).compareTo(v2) : -1);
-			}
-			else {
+			} else {
 				result = (v2 != null ? 1 : 0);
 			}
-		}
-		catch (RuntimeException ex) {
+		} catch (RuntimeException ex) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Could not sort objects [" + o1 + "] and [" + o2 + "]", ex);
 			}
@@ -104,6 +104,7 @@ public class PropertyComparator<T> implements Comparator<T> {
 
 	/**
 	 * Get the SortDefinition's property value for the given object.
+	 * 
 	 * @param obj the object to get the property value for
 	 * @return the property value
 	 */
@@ -116,19 +117,19 @@ public class PropertyComparator<T> implements Comparator<T> {
 			BeanWrapperImpl beanWrapper = new BeanWrapperImpl(false);
 			beanWrapper.setWrappedInstance(obj);
 			return beanWrapper.getPropertyValue(this.sortDefinition.getProperty());
-		}
-		catch (BeansException ex) {
+		} catch (BeansException ex) {
 			logger.debug("PropertyComparator could not access property - treating as null for sorting", ex);
 			return null;
 		}
 	}
 
-
 	/**
 	 * Sort the given List according to the given sort definition.
-	 * <p>Note: Contained objects have to provide the given property
+	 * <p>
+	 * Note: Contained objects have to provide the given property
 	 * in the form of a bean property, i.e. a getXXX method.
-	 * @param source the input List
+	 * 
+	 * @param source         the input List
 	 * @param sortDefinition the parameters to sort by
 	 * @throws java.lang.IllegalArgumentException in case of a missing propertyName
 	 */
@@ -140,9 +141,11 @@ public class PropertyComparator<T> implements Comparator<T> {
 
 	/**
 	 * Sort the given source according to the given sort definition.
-	 * <p>Note: Contained objects have to provide the given property
+	 * <p>
+	 * Note: Contained objects have to provide the given property
 	 * in the form of a bean property, i.e. a getXXX method.
-	 * @param source input source
+	 * 
+	 * @param source         input source
 	 * @param sortDefinition the parameters to sort by
 	 * @throws java.lang.IllegalArgumentException in case of a missing propertyName
 	 */

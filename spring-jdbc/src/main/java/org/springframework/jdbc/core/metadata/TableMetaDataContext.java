@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -78,7 +79,6 @@ public class TableMetaDataContext {
 
 	// Are we using generated key columns
 	private boolean generatedKeyColumnsUsed = false;
-
 
 	/**
 	 * Set the name of the table for this context.
@@ -139,7 +139,6 @@ public class TableMetaDataContext {
 		return this.accessTableColumnMetaData;
 	}
 
-
 	/**
 	 * Specify whether we should override default for accessing synonyms.
 	 */
@@ -161,11 +160,11 @@ public class TableMetaDataContext {
 		return this.tableColumns;
 	}
 
-
 	/**
 	 * Process the current meta-data with the provided configuration options.
-	 * @param dataSource the DataSource being used
-	 * @param declaredColumns any columns that are declared
+	 * 
+	 * @param dataSource        the DataSource being used
+	 * @param declaredColumns   any columns that are declared
 	 * @param generatedKeyNames name of generated keys
 	 */
 	public void processMetaData(DataSource dataSource, List<String> declaredColumns, String[] generatedKeyNames) {
@@ -179,8 +178,10 @@ public class TableMetaDataContext {
 	}
 
 	/**
-	 * Compare columns created from meta-data with declared columns and return a reconciled list.
-	 * @param declaredColumns declared column names
+	 * Compare columns created from meta-data with declared columns and return a
+	 * reconciled list.
+	 * 
+	 * @param declaredColumns   declared column names
 	 * @param generatedKeyNames names of generated key columns
 	 */
 	protected List<String> reconcileColumnsToUse(List<String> declaredColumns, String[] generatedKeyNames) {
@@ -192,11 +193,11 @@ public class TableMetaDataContext {
 		}
 		Set<String> keys = new LinkedHashSet<>(generatedKeyNames.length);
 		for (String key : generatedKeyNames) {
-			keys.add(key.toUpperCase());
+			keys.add(key.toUpperCase(Locale.ROOT));
 		}
 		List<String> columns = new ArrayList<>();
 		for (TableParameterMetaData meta : obtainMetaDataProvider().getTableParameterMetaData()) {
-			if (!keys.contains(meta.getParameterName().toUpperCase())) {
+			if (!keys.contains(meta.getParameterName().toUpperCase(Locale.ROOT))) {
 				columns.add(meta.getParameterName());
 			}
 		}
@@ -205,34 +206,32 @@ public class TableMetaDataContext {
 
 	/**
 	 * Match the provided column names and values with the list of columns used.
+	 * 
 	 * @param parameterSource the parameter names and values
 	 */
 	public List<Object> matchInParameterValuesWithInsertColumns(SqlParameterSource parameterSource) {
 		List<Object> values = new ArrayList<>();
-		// For parameter source lookups we need to provide case-insensitive lookup support since the
+		// For parameter source lookups we need to provide case-insensitive lookup
+		// support since the
 		// database meta-data is not necessarily providing case-sensitive column names
-		Map<String, String> caseInsensitiveParameterNames =
-				SqlParameterSourceUtils.extractCaseInsensitiveParameterNames(parameterSource);
+		Map<String, String> caseInsensitiveParameterNames = SqlParameterSourceUtils
+				.extractCaseInsensitiveParameterNames(parameterSource);
 		for (String column : this.tableColumns) {
 			if (parameterSource.hasValue(column)) {
 				values.add(SqlParameterSourceUtils.getTypedValue(parameterSource, column));
-			}
-			else {
-				String lowerCaseName = column.toLowerCase();
+			} else {
+				String lowerCaseName = column.toLowerCase(Locale.ROOT);
 				if (parameterSource.hasValue(lowerCaseName)) {
 					values.add(SqlParameterSourceUtils.getTypedValue(parameterSource, lowerCaseName));
-				}
-				else {
+				} else {
 					String propertyName = JdbcUtils.convertUnderscoreNameToPropertyName(column);
 					if (parameterSource.hasValue(propertyName)) {
 						values.add(SqlParameterSourceUtils.getTypedValue(parameterSource, propertyName));
-					}
-					else {
+					} else {
 						if (caseInsensitiveParameterNames.containsKey(lowerCaseName)) {
 							values.add(SqlParameterSourceUtils.getTypedValue(
 									parameterSource, caseInsensitiveParameterNames.get(lowerCaseName)));
-						}
-						else {
+						} else {
 							values.add(null);
 						}
 					}
@@ -244,6 +243,7 @@ public class TableMetaDataContext {
 
 	/**
 	 * Match the provided column names and values with the list of columns used.
+	 * 
 	 * @param inParameters the parameter names and values
 	 */
 	public List<Object> matchInParameterValuesWithInsertColumns(Map<String, ?> inParameters) {
@@ -251,7 +251,7 @@ public class TableMetaDataContext {
 		for (String column : this.tableColumns) {
 			Object value = inParameters.get(column);
 			if (value == null) {
-				value = inParameters.get(column.toLowerCase());
+				value = inParameters.get(column.toLowerCase(Locale.ROOT));
 				if (value == null) {
 					for (Map.Entry<String, ?> entry : inParameters.entrySet()) {
 						if (column.equalsIgnoreCase(entry.getKey())) {
@@ -266,15 +266,15 @@ public class TableMetaDataContext {
 		return values;
 	}
 
-
 	/**
 	 * Build the insert string based on configuration and meta-data information.
+	 * 
 	 * @return the insert string to be used
 	 */
 	public String createInsertString(String... generatedKeyNames) {
 		Set<String> keys = new LinkedHashSet<>(generatedKeyNames.length);
 		for (String key : generatedKeyNames) {
-			keys.add(key.toUpperCase());
+			keys.add(key.toUpperCase(Locale.ROOT));
 		}
 		StringBuilder insertStatement = new StringBuilder();
 		insertStatement.append("INSERT INTO ");
@@ -286,7 +286,7 @@ public class TableMetaDataContext {
 		insertStatement.append(" (");
 		int columnCount = 0;
 		for (String columnName : getTableColumns()) {
-			if (!keys.contains(columnName.toUpperCase())) {
+			if (!keys.contains(columnName.toUpperCase(Locale.ROOT))) {
 				columnCount++;
 				if (columnCount > 1) {
 					insertStatement.append(", ");
@@ -301,8 +301,7 @@ public class TableMetaDataContext {
 					logger.debug("Unable to locate non-key columns for table '" +
 							getTableName() + "' so an empty insert statement is generated");
 				}
-			}
-			else {
+			} else {
 				String message = "Unable to locate columns for table '" + getTableName()
 						+ "' so an insert statement can't be generated.";
 				if (isAccessTableColumnMetaData()) {
@@ -318,7 +317,9 @@ public class TableMetaDataContext {
 	}
 
 	/**
-	 * Build the array of {@link java.sql.Types} based on configuration and meta-data information.
+	 * Build the array of {@link java.sql.Types} based on configuration and
+	 * meta-data information.
+	 * 
 	 * @return the array of types to be used
 	 */
 	public int[] createInsertTypes() {
@@ -326,19 +327,17 @@ public class TableMetaDataContext {
 		List<TableParameterMetaData> parameters = obtainMetaDataProvider().getTableParameterMetaData();
 		Map<String, TableParameterMetaData> parameterMap = CollectionUtils.newLinkedHashMap(parameters.size());
 		for (TableParameterMetaData tpmd : parameters) {
-			parameterMap.put(tpmd.getParameterName().toUpperCase(), tpmd);
+			parameterMap.put(tpmd.getParameterName().toUpperCase(Locale.ROOT), tpmd);
 		}
 		int typeIndx = 0;
 		for (String column : getTableColumns()) {
 			if (column == null) {
 				types[typeIndx] = SqlTypeValue.TYPE_UNKNOWN;
-			}
-			else {
-				TableParameterMetaData tpmd = parameterMap.get(column.toUpperCase());
+			} else {
+				TableParameterMetaData tpmd = parameterMap.get(column.toUpperCase(Locale.ROOT));
 				if (tpmd != null) {
 					types[typeIndx] = tpmd.getSqlType();
-				}
-				else {
+				} else {
 					types[typeIndx] = SqlTypeValue.TYPE_UNKNOWN;
 				}
 			}
@@ -346,7 +345,6 @@ public class TableMetaDataContext {
 		}
 		return types;
 	}
-
 
 	/**
 	 * Does this database support the JDBC 3.0 feature of retrieving generated keys:
@@ -369,7 +367,9 @@ public class TableMetaDataContext {
 	 * Does this database support a simple query to retrieve generated keys
 	 * when the JDBC 3.0 feature is not supported:
 	 * {@link java.sql.DatabaseMetaData#supportsGetGeneratedKeys()}?
-	 * @deprecated as of 4.3.15, in favor of {@link #getSimpleQueryForGetGeneratedKey}
+	 * 
+	 * @deprecated as of 4.3.15, in favor of
+	 *             {@link #getSimpleQueryForGetGeneratedKey}
 	 */
 	@Deprecated
 	@Nullable

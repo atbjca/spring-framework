@@ -69,14 +69,17 @@ public abstract class CoroutinesUtils {
 	 * Invoke a suspending function and converts it to {@link Mono} or
 	 * {@link Flux}.
 	 */
+	@SuppressWarnings("deprecation")
 	public static Publisher<?> invokeSuspendingFunction(Method method, Object target, Object... args) {
 		KFunction<?> function = Objects.requireNonNull(ReflectJvmMapping.getKotlinFunction(method));
 		if (method.isAccessible() && !KCallablesJvm.isAccessible(function)) {
 			KCallablesJvm.setAccessible(function, true);
 		}
 		KClassifier classifier = function.getReturnType().getClassifier();
-		Mono<Object> mono = MonoKt.mono(Dispatchers.getUnconfined(), (scope, continuation) ->
-					KCallables.callSuspend(function, getSuspendedFunctionArgs(target, args), continuation))
+		Mono<Object> mono = MonoKt
+				.mono(Dispatchers.getUnconfined(),
+						(scope, continuation) -> KCallables.callSuspend(function,
+								getSuspendedFunctionArgs(target, args), continuation))
 				.filter(result -> !Objects.equals(result, Unit.INSTANCE))
 				.onErrorMap(InvocationTargetException.class, InvocationTargetException::getTargetException);
 		if (classifier != null && classifier.equals(JvmClassMappingKt.getKotlinClass(Flow.class))) {

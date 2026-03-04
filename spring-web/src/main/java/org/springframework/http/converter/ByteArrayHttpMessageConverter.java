@@ -18,6 +18,7 @@ package org.springframework.http.converter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -26,11 +27,16 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StreamUtils;
 
 /**
- * Implementation of {@link HttpMessageConverter} that can read and write byte arrays.
+ * Implementation of {@link HttpMessageConverter} that can read and write byte
+ * arrays.
  *
- * <p>By default, this converter supports all media types (<code>&#42;/&#42;</code>), and
- * writes with a {@code Content-Type} of {@code application/octet-stream}. This can be
- * overridden by setting the {@link #setSupportedMediaTypes supportedMediaTypes} property.
+ * <p>
+ * By default, this converter supports all media types
+ * (<code>&#42;/&#42;</code>), and
+ * writes with a {@code Content-Type} of {@code application/octet-stream}. This
+ * can be
+ * overridden by setting the {@link #setSupportedMediaTypes supportedMediaTypes}
+ * property.
  *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
@@ -45,6 +51,27 @@ public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<
 		super(MediaType.APPLICATION_OCTET_STREAM, MediaType.ALL);
 	}
 
+	private int maxInMemorySize = -1;
+
+	/**
+	 * Set the maximum number of bytes that can be read into memory.
+	 * <p>
+	 * By default this is set to -1, which means no limit.
+	 * 
+	 * @since 5.3.42
+	 */
+	public void setMaxInMemorySize(int maxInMemorySize) {
+		this.maxInMemorySize = maxInMemorySize;
+	}
+
+	/**
+	 * Return the maximum number of bytes that can be read into memory.
+	 * 
+	 * @since 5.3.42
+	 */
+	public int getMaxInMemorySize() {
+		return this.maxInMemorySize;
+	}
 
 	@Override
 	public boolean supports(Class<?> clazz) {
@@ -54,9 +81,21 @@ public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<
 	@Override
 	public byte[] readInternal(Class<? extends byte[]> clazz, HttpInputMessage inputMessage) throws IOException {
 		long contentLength = inputMessage.getHeaders().getContentLength();
-		ByteArrayOutputStream bos =
-				new ByteArrayOutputStream(contentLength >= 0 ? (int) contentLength : StreamUtils.BUFFER_SIZE);
-		StreamUtils.copy(inputMessage.getBody(), bos);
+		if (contentLength >= 0 && this.maxInMemorySize >= 0 && contentLength > this.maxInMemorySize) {
+			throw new IOException(
+					"Content-Length exceeds the configured maximum of " + this.maxInMemorySize + " bytes");
+		}
+		ByteArrayOutputStream bos = (contentLength >= 0 ? new ByteArrayOutputStream((int) contentLength)
+				: new ByteArrayOutputStream());
+		InputStream in = inputMessage.getBody();
+		byte[] buffer = new byte[StreamUtils.BUFFER_SIZE];
+		int bytesRead;
+		while ((bytesRead = in.read(buffer)) != -1) {
+			bos.write(buffer, 0, bytesRead);
+			if (this.maxInMemorySize >= 0 && bos.size() > this.maxInMemorySize) {
+				throw new IOException("Memory limit exceeded: " + this.maxInMemorySize + " bytes");
+			}
+		}
 		return bos.toByteArray();
 	}
 

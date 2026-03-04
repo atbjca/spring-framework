@@ -31,9 +31,9 @@
     - **CVE-2016-1000027**: 已彻底删除 `remoting/httpinvoker` 风险组件源并创建 [CVE-2016-1000027.md](./CVE/CVE-2016-1000027.md)。
     - **CVE-2025-41234**: 经代码排查验证 5.3 分支免疫（不存在导致风险的 Q-Encoding 逻辑），已出具 [CVE-2025-41234.md](./CVE/CVE-2025-41234.md) 声明文档。
 - [/] **新增漏洞修复流水线 (Phase 2)**: 开始计划修复追加的 3 个安全漏洞。
-    - **CVE-2024-38819**: 待修复 (WebMvc.fn/WebFlux.fn 路径穿越二期 Bypass)。
-    - **CVE-2024-38827**: 待排查 (主要影响 Spring Security 授权逻辑，排查其在本项目中是否免疫)。
-    - **CVE-2024-38828**: 待修复 (Spring MVC `@RequestBody byte[]` 造成的 DoS 攻击)。
+    - **CVE-2024-38819**: 已完成 (WebMvc.fn/WebFlux.fn 路径穿越二期 Bypass) -> [CVE-2024-38819.md](./CVE/CVE-2024-38819.md)。
+    - **CVE-2024-38827**: 进行中 (Spring Security 授权绕过，排查其在本项目中是否免疫)。
+    - **CVE-2024-38828**: 进行中 (Spring MVC `@RequestBody byte[]` 造成的 DoS 攻击)。
 
 ## 4. 发布指南
 发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。

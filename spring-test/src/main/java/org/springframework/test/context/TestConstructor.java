@@ -22,6 +22,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,33 +35,44 @@ import org.springframework.lang.Nullable;
  * in the test's {@link org.springframework.context.ApplicationContext
  * ApplicationContext}.
  *
- * <p>If {@code @TestConstructor} is not <em>present</em> or <em>meta-present</em>
+ * <p>
+ * If {@code @TestConstructor} is not <em>present</em> or <em>meta-present</em>
  * on a test class, the default <em>test constructor autowire mode</em> will be
- * used. See {@link #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME} for details on
+ * used. See {@link #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME} for details
+ * on
  * how to change the default mode. Note, however, that a local declaration of
  * {@link org.springframework.beans.factory.annotation.Autowired @Autowired} on
- * a constructor takes precedence over both {@code @TestConstructor} and the default
+ * a constructor takes precedence over both {@code @TestConstructor} and the
+ * default
  * mode.
  *
- * <p>This annotation may be used as a <em>meta-annotation</em> to create custom
+ * <p>
+ * This annotation may be used as a <em>meta-annotation</em> to create custom
  * <em>composed annotations</em>.
  *
- * <p>As of Spring Framework 5.2, this annotation is only supported in conjunction
- * with the {@link org.springframework.test.context.junit.jupiter.SpringExtension
- * SpringExtension} for use with JUnit Jupiter. Note that the {@code SpringExtension} is
- * often automatically registered for you &mdash; for example, when using annotations such as
- * {@link org.springframework.test.context.junit.jupiter.SpringJUnitConfig @SpringJUnitConfig} and
+ * <p>
+ * As of Spring Framework 5.2, this annotation is only supported in conjunction
+ * with the
+ * {@link org.springframework.test.context.junit.jupiter.SpringExtension
+ * SpringExtension} for use with JUnit Jupiter. Note that the
+ * {@code SpringExtension} is
+ * often automatically registered for you &mdash; for example, when using
+ * annotations such as
+ * {@link org.springframework.test.context.junit.jupiter.SpringJUnitConfig @SpringJUnitConfig}
+ * and
  * {@link org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig @SpringJUnitWebConfig}
  * or various test-related annotations from Spring Boot Test.
  *
- * <p>As of Spring Framework 5.3, this annotation will be inherited from an
+ * <p>
+ * As of Spring Framework 5.3, this annotation will be inherited from an
  * enclosing test class by default. See
  * {@link NestedTestConfiguration @NestedTestConfiguration} for details.
  *
  * @author Sam Brannen
  * @since 5.2
  * @see org.springframework.beans.factory.annotation.Autowired @Autowired
- * @see org.springframework.test.context.junit.jupiter.SpringExtension SpringExtension
+ * @see org.springframework.test.context.junit.jupiter.SpringExtension
+ *      SpringExtension
  * @see org.springframework.test.context.junit.jupiter.SpringJUnitConfig @SpringJUnitConfig
  * @see org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig @SpringJUnitWebConfig
  * @see ContextConfiguration @ContextConfiguration
@@ -77,30 +89,41 @@ public @interface TestConstructor {
 	/**
 	 * JVM system property used to change the default <em>test constructor
 	 * autowire mode</em>: {@value #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME}.
-	 * <p>Acceptable values include enum constants defined in {@link AutowireMode},
-	 * ignoring case. For example, the default may be changed to {@link AutowireMode#ALL}
+	 * <p>
+	 * Acceptable values include enum constants defined in {@link AutowireMode},
+	 * ignoring case. For example, the default may be changed to
+	 * {@link AutowireMode#ALL}
 	 * by supplying the following JVM system property via the command line.
-	 * <pre style="code">-Dspring.test.constructor.autowire.mode=all</pre>
-	 * <p>If the property is not set to {@code ALL}, parameters for test class
+	 * 
+	 * <pre style="code">
+	 * -Dspring.test.constructor.autowire.mode=all
+	 * </pre>
+	 * <p>
+	 * If the property is not set to {@code ALL}, parameters for test class
 	 * constructors will be autowired according to {@link AutowireMode#ANNOTATED}
 	 * semantics by default.
-	 * <p>May alternatively be configured via the
+	 * <p>
+	 * May alternatively be configured via the
 	 * {@link org.springframework.core.SpringProperties SpringProperties}
 	 * mechanism.
-	 * <p>As of Spring Framework 5.3, this property may also be configured as a
-	 * <a href="https://junit.org/junit5/docs/current/user-guide/#running-tests-config-params">JUnit
+	 * <p>
+	 * As of Spring Framework 5.3, this property may also be configured as a
+	 * <a href=
+	 * "https://junit.org/junit5/docs/current/user-guide/#running-tests-config-params">JUnit
 	 * Platform configuration parameter</a>.
+	 * 
 	 * @see #autowireMode
 	 */
 	String TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME = "spring.test.constructor.autowire.mode";
 
-
 	/**
 	 * Flag for setting the <em>test constructor {@linkplain AutowireMode autowire
 	 * mode}</em> for the current test class.
-	 * <p>Setting this flag overrides the global default. See
+	 * <p>
+	 * Setting this flag overrides the global default. See
 	 * {@link #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME} for details on how
 	 * to change the global default.
+	 * 
 	 * @return an {@link AutowireMode} to take precedence over the global default
 	 * @see #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME
 	 * @see org.springframework.beans.factory.annotation.Autowired @Autowired
@@ -109,9 +132,9 @@ public @interface TestConstructor {
 	 */
 	AutowireMode autowireMode();
 
-
 	/**
 	 * Defines autowiring modes for parameters in a test constructor.
+	 * 
 	 * @see #ALL
 	 * @see #ANNOTATED
 	 */
@@ -121,6 +144,7 @@ public @interface TestConstructor {
 		 * All test constructor parameters will be autowired as if the constructor
 		 * itself were annotated with
 		 * {@link org.springframework.beans.factory.annotation.Autowired @Autowired}.
+		 * 
 		 * @see #ANNOTATED
 		 */
 		ALL,
@@ -132,14 +156,15 @@ public @interface TestConstructor {
 		 * {@link org.springframework.beans.factory.annotation.Qualifier @Qualifier},
 		 * or {@link org.springframework.beans.factory.annotation.Value @Value},
 		 * or if the constructor itself is annotated with {@code @Autowired}.
+		 * 
 		 * @see #ALL
 		 */
 		ANNOTATED;
 
-
 		/**
 		 * Get the {@code AutowireMode} enum constant with the supplied name,
 		 * ignoring case.
+		 * 
 		 * @param name the name of the enum constant to retrieve
 		 * @return the corresponding enum constant or {@code null} if not found
 		 * @since 5.3
@@ -151,9 +176,8 @@ public @interface TestConstructor {
 				return null;
 			}
 			try {
-				return AutowireMode.valueOf(name.trim().toUpperCase());
-			}
-			catch (IllegalArgumentException ex) {
+				return AutowireMode.valueOf(name.trim().toUpperCase(Locale.ROOT));
+			} catch (IllegalArgumentException ex) {
 				Log logger = LogFactory.getLog(AutowireMode.class);
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format("Failed to parse autowire mode from '%s': %s", name, ex.getMessage()));

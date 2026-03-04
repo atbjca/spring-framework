@@ -20,15 +20,15 @@ build: clean ## 编译打包
 	./gradlew build
 
 build-thin: clean ## 编译打包（瘦身版）
-	./gradlew build -x test -x checkstyleMain -x checkstyleTest -x asciidoctor -x javadoc
+	./gradlew build -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x asciidoctor -x javadoc
 
 # 编译并安装到本地 Maven 仓库（跳过测试和耗时的文档生成）
 install: 
-	./gradlew clean publishToMavenLocal -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoctor -x asciidoctorPdf -x api
+	./gradlew clean publishToMavenLocal -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 发布到 Nexus 私服（跳过测试和耗时的文档生成）
 deploy:
-	./gradlew clean publish -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoctor -x asciidoctorPdf -x api
+	./gradlew clean publish -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 专门用于生成文档的命令（如果确实需要 API 文档时使用）
 docs: clean
