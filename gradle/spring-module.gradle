@@ -39,7 +39,7 @@ jmhJar {
 
 jar {
 	manifest.attributes["Implementation-Title"] = project.name
-	manifest.attributes["Implementation-Version"] = project.version
+	manifest.attributes["Implementation-Version"] = project.properties["originalVersion"]
 	manifest.attributes["Automatic-Module-Name"] = project.name.replace('-', '.')  // for Jigsaw
 	manifest.attributes["Created-By"] =
 			"${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
@@ -90,6 +90,7 @@ task javadocJar(type: Jar) {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+			artifactId = project.name.replace("spring-", "bjca-footstone-bpring-")
 			from components.java
 			artifact sourcesJar
 			artifact javadocJar

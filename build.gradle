@@ -479,6 +479,7 @@ configure(rootProject) {
 	publishing {
 		publications {
 			mavenJava(MavenPublication) {
+				artifactId = project.name.replace("spring", "bjca-footstone-bpring")
 				artifact docsZip
 				artifact schemaZip
 				artifact distZip

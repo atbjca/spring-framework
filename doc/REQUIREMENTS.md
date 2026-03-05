@@ -1,49 +1,26 @@
-# 项目需求与配置说明 (REQUIREMENTS.md)
+# 业务需求说明 (REQUIREMENTS.md)
 
-## 1. 基础设施要求
+## 背景
+我们fork并维护了一个官方已停止更新的老版本Spring Framework（基于5.3.39系列的spring-core、spring-web等模块），并已经在源码层面参照官方更高版本（5.3.x / 6.x）手动backport了已知CVE的修复补丁。计划长期自行维护并发布到公司内部Maven仓库（Nexus）。
 
-### 1.1 Gradle 配置
-项目已集成 Nexus 私服支持及全局变量化管理，配置文件如下：
-- `gradle.properties`: 维护项目版本 (`version`)、组 ID (`projectGroup`) 以及私服 URL 及凭据 (`nexusPublicUrl` 等)。
-- `settings.gradle`: 在 `pluginManagement` 中集成私服仓库。
-- `build.gradle`: 在 `allprojects` 和 `publishing` 块中配置私服仓库，并引用全局 `projectGroup`。
+## 面临问题
+公司强制执行SCA扫描（依赖安全检查）。这些工具一旦识别出原始GAV（`org.springframework:spring-xxx`）或强特征，即使已经修补，也会报高危漏洞并阻断构建/发布流程。
 
-### 1.2 Makefile 快捷指令
-为了简化开发流程，项目根目录提供了 `Makefile`，常用命令包括：
-- `make build-thin`: 编译打包（排除测试和文档）。
-- `make install`: 编译并安装到本地 Maven。**默认跳过文档生成**以优化速度。
-- `make deploy`: 发布到 Nexus 私服。**默认跳过文档生成**。
-- `make docs`: **专门用于生成项目文档** (Javadoc/Dokka/Asciidoc)。
-- `make clean`: 清理构建产物。
+## 目标
+在**完全不修改任何Java源代码的package名、类名、类路径、导入语句**的前提下：
+让这个自维护版本在主流SCA工具的扫描结果中尽量**不被判定为官方有漏洞的Spring组件**。
 
-## 2. 依赖管理
-项目遵循 Spring 官方的依赖管理规范，通过 `io.spring.dependency-management` 插件进行版本控制。
+下游业务项目接受：
+- 批量修改POM.xml 或 build.gradle 中的依赖坐标。
 
-## 3. 安全与合规
-- [x] 配置项目全局 Group ID，支持通过 `gradle.properties` 一键修改。
-- [x] 优化构建命令，默认跳过 `javadoc` 等耗时文档生成任务。
-- [x] **漏洞修复流水线**: 已完成全部识别出的 CVE 漏洞排查与修复。
-    - **CVE-2024-38816**: 已完成代码修复并创建 [CVE-2024-38816.md](./CVE/CVE-2024-38816.md)。
-    - **CVE-2024-38820**: 已完成代码修复并创建 [CVE-2024-38820.md](./CVE/CVE-2024-38820.md)。
- - [x] Phase 3: 已确认 5.3.39 基线已包含以下漏洞修复，并建立审计文档：
-    - [x] **CVE-2024-38808**: [CVE-2024-38808.md](./CVE/CVE-2024-38808.md) (SpEL DoS)
-    - [x] **CVE-2024-22262**: [CVE-2024-22262.md](./CVE/CVE-2024-22262.md) (UriComponentsBuilder 绕过)
-    - [x] **CVE-2024-22243**: [CVE-2024-22243.md](./CVE/CVE-2024-22243.md) (UriComponentsBuilder 绕过)
-    - [x] **CVE-2024-22259**: [CVE-2024-22259.md](./CVE/CVE-2024-22259.md) (UriComponentsBuilder 绕过)
-    - [x] **CVE-2024-38809**: [CVE-2024-38809.md](./CVE/CVE-2024-38809.md) (ETag DoS)
-    - **CVE-2025-22233**: 已完成代码修复（引入 `PatternMatchUtils.simpleMatchIgnoreCase`）并创建 [CVE-2025-22233.md](./CVE/CVE-2025-22233.md)。
-    - **CVE-2025-41249**: 已完成代码修复（`resolve()` → `toClass()`）并创建 [CVE-2025-41249.md](./CVE/CVE-2025-41249.md)。
-    - **CVE-2025-41242**: 已完成代码修复（重构 `StringUtils.uriDecode`）并创建 [CVE-2025-41242.md](./CVE/CVE-2025-41242.md)。
-    - **CVE-2016-1000027**: 已彻底删除 `remoting/httpinvoker` 风险组件源并创建 [CVE-2016-1000027.md](./CVE/CVE-2016-1000027.md)。
-    - **CVE-2025-41234**: 经代码排查验证 5.3 分支免疫（不存在导致风险的 Q-Encoding 逻辑），已出具 [CVE-2025-41234.md](./CVE/CVE-2025-41234.md) 声明文档。
-- [x] **新增漏洞修复流水线 (Phase 2)**: 已完成追加的 3 个安全漏洞修复与文档。
-    - **CVE-2024-38819**: 已完成 (WebMvc.fn/WebFlux.fn 路径穿越二期 Bypass) -> [CVE-2024-38819.md](./CVE/CVE-2024-38819.md)。
-    - **CVE-2024-38827**: 已完成 (Spring Security 授权绕过) -> [CVE-2024-38827.md](./CVE/CVE-2024-38827.md)。
-    - **CVE-2024-38828**: 已完成 (Spring MVC `@RequestBody byte[]` DoS) -> [CVE-2024-38828.md](./CVE/CVE-2024-38828.md)。
+不能接受：
+- 修改业务Java代码的import语句或类引用机制（破坏import兼容性）。
 
-## 4. 发布指南
-发布前请确保 `gradle.properties` 中的版本号正确，并已配置有效的 Nexus 凭据。
-- **发布范围**:
-    - **部署组件**: 根项目 (`spring`)、BOM (`framework-bom`) 以及所有核心模块 (`spring-*`)。
-    - **不部署组件**: 内部测试模块 (`integration-tests`) 已被显式排除，不会上传至私服。
-- **配置实现**: 发布地址已全局化，所有子项目均会自动寻址到 Nexus 仓库。
+## 具体改动
+- groupId 统一改为：`cn.bjca.footstone.bpring`
+- artifactId 统一前缀：`bjca-footstone-bpring-` + 去掉原`spring-`前缀的首字母小写（例如：`spring-core` → `bjca-footstone-bpring-core`，`spring-framework-bom` → `bjca-footstone-bpring-framework-bom`）
+- version：原版号 + `-bjca-patched.1`（例如 `5.3.39-bjca-patched.1`）
+
+## 关键约束
+1. 只涉及构建脚本GAV层面的修改，绝对保持Java层兼容性。
+2. `SpringVersion.getVersion()` 获取到的版本号必须仍然是原始的 `5.3.39` 以确保框架内部校验不会因为版本号变更而出错。
