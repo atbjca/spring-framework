@@ -2,7 +2,7 @@ plugins {
 	id "org.unbroken-dome.xjc"
 }
 
-description = "Spring Object/XML Marshalling"
+description = "BJCA Footstone Bpring Object/XML Marshalling"
 
 configurations {
 	jibx

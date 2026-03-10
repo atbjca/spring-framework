@@ -1,4 +1,4 @@
-description = "Spring Expression Language (SpEL)"
+description = "BJCA Footstone Bpring Expression Language (SpEL)"
 
 apply plugin: "kotlin"
 

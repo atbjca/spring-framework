@@ -1,4 +1,4 @@
-description = "Spring Aspects"
+description = "BJCA Footstone Bpring Aspects"
 
 apply plugin: "io.freefair.aspectj"
 

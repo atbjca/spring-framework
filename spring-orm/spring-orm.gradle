@@ -1,4 +1,4 @@
-description = "Spring Object/Relational Mapping"
+description = "BJCA Footstone Bpring Object/Relational Mapping"
 
 dependencies {
 	api(project(":spring-beans"))

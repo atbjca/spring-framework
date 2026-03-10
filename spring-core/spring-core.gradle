@@ -1,6 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-description = "Spring Core"
+description = "BJCA Footstone Bpring Core"
 
 apply plugin: "kotlin"
 

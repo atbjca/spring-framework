@@ -1,4 +1,4 @@
-description = "Spring JMS"
+description = "BJCA Footstone Bpring JMS"
 
 dependencies {
 	api(project(":spring-beans"))

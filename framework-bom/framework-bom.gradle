@@ -1,4 +1,4 @@
-description = "Spring Framework (Bill of Materials)"
+description = "BJCA Footstone Bpring Framework (Bill of Materials)"
 
 apply plugin: 'java-platform'
 apply from: "$rootDir/gradle/publications.gradle"

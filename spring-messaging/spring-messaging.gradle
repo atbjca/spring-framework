@@ -1,4 +1,4 @@
-description = "Spring Messaging"
+description = "BJCA Footstone Bpring Messaging"
 
 apply plugin: "kotlin"
 apply plugin: "kotlinx-serialization"

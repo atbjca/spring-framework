@@ -1,4 +1,4 @@
-description = "Spring Context Support"
+description = "BJCA Footstone Bpring Context Support"
 
 dependencies {
 	api(project(":spring-beans"))

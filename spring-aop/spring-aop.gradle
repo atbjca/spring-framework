@@ -1,4 +1,4 @@
-description = "Spring AOP"
+description = "BJCA Footstone Bpring AOP"
 
 dependencies {
 	api(project(":spring-beans"))

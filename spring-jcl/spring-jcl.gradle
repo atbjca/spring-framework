@@ -1,4 +1,4 @@
-description = "Spring Commons Logging Bridge"
+description = "BJCA Footstone Bpring Commons Logging Bridge"
 
 dependencies {
 	optional("org.apache.logging.log4j:log4j-api")

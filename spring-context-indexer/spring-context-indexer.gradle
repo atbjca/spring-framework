@@ -1,4 +1,4 @@
-description = "Spring Context Indexer"
+description = "BJCA Footstone Bpring Context Indexer"
 
 dependencies {
 	testImplementation(project(":spring-context"))

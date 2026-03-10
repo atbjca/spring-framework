@@ -1,4 +1,4 @@
-description = "Spring JDBC"
+description = "BJCA Footstone Bpring JDBC"
 
 apply plugin: "kotlin"
 

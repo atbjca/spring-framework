@@ -1,4 +1,4 @@
-description = "Spring Context"
+description = "BJCA Footstone Bpring Context"
 
 apply plugin: "groovy"
 apply plugin: "kotlin"

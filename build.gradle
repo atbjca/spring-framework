@@ -449,7 +449,7 @@ configure(moduleProjects) { project ->
 }
 
 configure(rootProject) {
-	description = "Spring Framework"
+	description = "BJCA Footstone Bpring Framework"
 
 	apply plugin: "kotlin"
 	apply plugin: "io.spring.nohttp"
