@@ -5,7 +5,7 @@ plugins {
 	id 'me.champeau.mrjar'
 }
 
-description = "Spring Core"
+description = "BJCA Footstone Bpring Core"
 
 apply plugin: "kotlin"
 apply plugin: "kotlinx-serialization"

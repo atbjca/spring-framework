@@ -1,4 +1,4 @@
-description = "Spring TestContext Framework"
+description = "BJCA Footstone Bpring TestContext Framework"
 
 apply plugin: "kotlin"
 

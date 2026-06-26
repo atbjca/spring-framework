@@ -1,4 +1,4 @@
-description = "Spring Instrument"
+description = "BJCA Footstone Bpring Instrument"
 
 jar {
 	manifest.attributes["Premain-Class"] =

@@ -2,7 +2,7 @@ plugins {
 	id 'org.springframework.build.runtimehints-agent'
 }
 
-description = "Spring Context"
+description = "BJCA Footstone Bpring Context"
 
 apply plugin: "kotlin"
 

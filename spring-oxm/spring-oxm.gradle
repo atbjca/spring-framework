@@ -4,7 +4,7 @@ plugins {
 	id "com.github.bjornvester.xjc"
 }
 
-description = "Spring Object/XML Marshalling"
+description = "BJCA Footstone Bpring Object/XML Marshalling"
 
 xjc {
 	xsdDir.set(layout.projectDirectory.dir("src/test/schema"))

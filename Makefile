@@ -17,13 +17,16 @@ GRADLE_ARGS := -Porg.gradle.java.installations.fromEnv=JDK17 --no-daemon
 export JDK17
 export GRADLE_USER_HOME
 
-.PHONY: help test test-module clean stop projects
+.PHONY: help test test-module clean stop projects build-thin install deploy
 
 help: ## 显示帮助信息
 	@echo ""
 	@echo "可用命令:"
+	@echo "  make build-thin   - 编译打包（跳过测试，较快）"
 	@echo "  make test          - 运行全项目单元/集成测试（gradle test）"
 	@echo "  make test-module M=spring-core  - 仅测试指定模块，例如 spring-webmvc"
+	@echo "  make install       - 安装到本地 Maven（~/.m2）"
+	@echo "  make deploy        - 发布到 Nexus（需配置 deploymentRepository）"
 	@echo "  make clean         - 清理构建产物"
 	@echo "  make stop          - 停止 Gradle Daemon"
 	@echo "  make projects      - 列出 Gradle 子项目"
@@ -52,3 +55,15 @@ stop: ## 停止 Gradle Daemon
 
 projects: ## 查看子项目列表
 	$(GRADLE_CMD) projects $(GRADLE_ARGS)
+
+build-thin: ## 编译打包（跳过测试）
+	@test -d "$(JDK17)" || (echo "错误: JDK17 不存在: $(JDK17)"; exit 1)
+	$(GRADLE_CMD) clean build -x test $(GRADLE_ARGS)
+
+install: ## 安装到本地 Maven
+	@test -d "$(JDK17)" || (echo "错误: JDK17 不存在: $(JDK17)"; exit 1)
+	$(GRADLE_CMD) clean publishToMavenLocal -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial $(GRADLE_ARGS)
+
+deploy: ## 发布到 Nexus
+	@test -d "$(JDK17)" || (echo "错误: JDK17 不存在: $(JDK17)"; exit 1)
+	$(GRADLE_CMD) clean publish -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial $(GRADLE_ARGS)

@@ -1,4 +1,4 @@
-description = "Spring WebSocket"
+description = "BJCA Footstone Bpring WebSocket"
 
 dependencies {
 	api(project(":spring-context"))

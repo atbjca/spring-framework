@@ -25,9 +25,13 @@ See the [Micro-Benchmarks](https://github.com/spring-projects/spring-framework/w
 
 See the [Build from Source](https://github.com/spring-projects/spring-framework/wiki/Build-from-Source) wiki page and the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
-## 本地维护（bjca-patch 分支）
+## 本地维护（bjca-patch / NES 6.2）
 
-- [测试指南](doc/TESTING.md) — 环境配置、`make test` 用法与 TDD 流程
+- [OpenSpec: 6.2 NES GAV 重品牌](openspec/changes/6.2-nes-gav-rebrand/proposal.md)
+- [业务需求](doc/REQUIREMENTS.md)
+- [GAV 映射表](doc/GAV_MAPPING.md)
+- [快速入门](doc/QUICK_START.md)
+- [测试指南](doc/TESTING.md)
 
 ## Continuous Integration Builds
 

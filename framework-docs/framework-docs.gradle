@@ -4,7 +4,7 @@ plugins {
 	id 'org.antora' version '1.0.0'
 }
 
-description = "Spring Framework Docs"
+description = "BJCA Footstone Bpring Framework Docs"
 
 apply from: "${rootDir}/gradle/ide.gradle"
 apply from: "${rootDir}/gradle/publications.gradle"

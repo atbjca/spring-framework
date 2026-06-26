@@ -3,7 +3,7 @@ plugins {
 	id 'io.freefair.aggregate-javadoc' version '8.13.1'
 }
 
-description = "Spring Framework API Docs"
+description = "BJCA Footstone Bpring Framework API Docs"
 
 apply from: "${rootDir}/gradle/publications.gradle"
 

@@ -17,11 +17,10 @@ ext {
 	javaProjects = subprojects.findAll { !it.name.startsWith("framework-") }
 }
 
-description = "Spring Framework"
+description = "BJCA Footstone Bpring Framework"
 
 configure(allprojects) { project ->
 	apply plugin: "org.springframework.build.localdev"
-	group = "org.springframework"
 	repositories {
 		mavenCentral()
 		maven {
@@ -61,6 +60,9 @@ configure(allprojects - project(":framework-platform")) {
 }
 
 configure([rootProject] + javaProjects) { project ->
+	// 引用 gradle.properties 中的 projectGroup，与 Boot NES 的 forkGroupIdBase 一致
+	group = projectGroup
+
 	apply plugin: "java"
 	apply plugin: "java-test-fixtures"
 	apply plugin: 'org.springframework.build.conventions'

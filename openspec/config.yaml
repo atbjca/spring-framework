@@ -1,0 +1,17 @@
+schema: spec-driven
+
+# 6.2.x NES Fork 项目上下文（供 AI 创建 artifact 时参考）
+context: |
+  技术栈：Spring Framework 6.2.x、Gradle 8.14、Java 17（Amazon Corretto）
+  分支：6.2.x-bjca-patch
+  目标：NES 自维护 fork，GAV 重品牌以降低 SCA 误报，保持 org.springframework.* 包兼容
+  命名：与 Spring Boot 2.7 NES 对齐（forkGroupIdBase / nes.patch 版本后缀）
+  流程：OpenSpec 文档先行 → 审批 → 实施 → make test 验证 → 更新 doc/
+
+rules:
+  proposal:
+    - 必须包含 Non-goals 章节
+    - 必须说明与 Boot 2.7 NES 的属性对照（projectGroup / version / originalVersion）
+  tasks:
+    - Gradle 改动与 doc 改动可并行；Java 源码改动须单独审批
+    - 每个 task 块不超过 2 小时量级

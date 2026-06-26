@@ -47,9 +47,11 @@ jmhJar {
 }
 
 jar {
-	manifest.attributes["Implementation-Title"] = project.name
-	manifest.attributes["Implementation-Version"] = project.version
-	manifest.attributes["Automatic-Module-Name"] = project.name.replace('-', '.')  // for Jigsaw
+	// 重品牌 manifest，降低 SCA 将制品识别为官方 Spring 的概率
+	manifest.attributes["Implementation-Title"] = project.name.replace("spring-", "bjca-footstone-bpring-")
+	// 使用 originalVersion，确保 SpringVersion.getVersion() 返回 6.2.19 而非 NES 后缀版本
+	manifest.attributes["Implementation-Version"] = originalVersion
+	manifest.attributes["Automatic-Module-Name"] = project.name.replace("spring-", "bjca-footstone-bpring-").replace('-', '.')
 	manifest.attributes["Created-By"] =
 			"${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
 
@@ -101,6 +103,7 @@ tasks.register('javadocJar', Jar) {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+			artifactId = project.name.replace("spring-", "bjca-footstone-bpring-")
 			from components.java
 			artifact sourcesJar
 			artifact javadocJar

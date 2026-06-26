@@ -1,4 +1,4 @@
-description = "Spring Web"
+description = "BJCA Footstone Bpring Web"
 
 apply plugin: "kotlin"
 apply plugin: "kotlinx-serialization"

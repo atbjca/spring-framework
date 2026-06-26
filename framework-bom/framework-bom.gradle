@@ -1,9 +1,9 @@
-description = "Spring Framework (Bill of Materials)"
+description = "BJCA Footstone Bpring Framework (Bill of Materials)"
 
 apply plugin: 'java-platform'
 apply from: "$rootDir/gradle/publications.gradle"
 
-group = "org.springframework"
+group = projectGroup
 
 dependencies {
 	constraints {
@@ -16,7 +16,7 @@ dependencies {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifactId = 'spring-framework-bom'
+			artifactId = 'bjca-footstone-bpring-framework-bom'
 			from components.javaPlatform
 		}
 	}

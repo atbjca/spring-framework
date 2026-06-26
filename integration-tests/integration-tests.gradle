@@ -3,7 +3,7 @@ plugins {
 	id 'kotlin'
 }
 
-description = "Spring Integration Tests"
+description = "BJCA Footstone Bpring Integration Tests"
 
 dependencies {
 	testImplementation(project(":spring-aop"))

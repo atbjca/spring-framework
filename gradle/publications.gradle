@@ -5,13 +5,13 @@ publishing {
 		mavenJava(MavenPublication) {
 			pom {
 				afterEvaluate {
-					name = project.description
-					description = project.description
+					name = project.description?.replace("Spring", "BJCA Footstone Bpring")
+					description = project.description?.replace("Spring", "BJCA Footstone Bpring")
 				}
-				url = "https://github.com/spring-projects/spring-framework"
+				url = "https://github.com/atbjca/spring-framework"
 				organization {
-					name = "Spring IO"
-					url = "https://spring.io/projects/spring-framework"
+					name = "BJCA"
+					url = "https://github.com/atbjca"
 				}
 				licenses {
 					license {
@@ -21,20 +21,20 @@ publishing {
 					}
 				}
 				scm {
-					url = "https://github.com/spring-projects/spring-framework"
-					connection = "scm:git:git://github.com/spring-projects/spring-framework"
-					developerConnection = "scm:git:git://github.com/spring-projects/spring-framework"
+					url = "https://github.com/atbjca/spring-framework"
+					connection = "scm:git:git://github.com/atbjca/spring-framework.git"
+					developerConnection = "scm:git:git://github.com/atbjca/spring-framework.git"
 				}
 				developers {
 					developer {
-						id = "jhoeller"
-						name = "Juergen Hoeller"
-						email = "juergen.hoeller@broadcom.com"
+						id = "atbjca"
+						name = "BJCA Footstone Team"
+						email = ""
 					}
 				}
 				issueManagement {
 					system = "GitHub"
-					url = "https://github.com/spring-projects/spring-framework/issues"
+					url = "https://github.com/atbjca/spring-framework/issues"
 				}
 			}
 			versionMapping {

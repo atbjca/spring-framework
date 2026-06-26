@@ -1,4 +1,4 @@
-description = "Spring Core Test"
+description = "BJCA Footstone Bpring Core Test"
 
 dependencies {
 	api(project(":spring-core"))

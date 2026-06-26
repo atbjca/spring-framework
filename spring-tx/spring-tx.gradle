@@ -1,4 +1,4 @@
-description = "Spring Transaction"
+description = "BJCA Footstone Bpring Transaction"
 
 apply plugin: "kotlin"
 

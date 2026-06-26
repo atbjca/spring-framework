@@ -1,4 +1,4 @@
-description = "Spring Beans"
+description = "BJCA Footstone Bpring Beans"
 
 apply plugin: "kotlin"
 
