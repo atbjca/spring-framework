@@ -72,7 +72,8 @@ public class JavaConventions {
 	 */
 	private void applyJavaCompileConventions(Project project) {
 		project.getExtensions().getByType(JavaPluginExtension.class).toolchain(toolchain -> {
-			toolchain.getVendor().set(JvmVendorSpec.BELLSOFT);
+			// 使用 Amazon Corretto 17，便于在本地 sdkman 环境（17.0.17-amzn）构建，无需下载 BellSoft Liberica
+			toolchain.getVendor().set(JvmVendorSpec.AMAZON);
 			toolchain.getLanguageVersion().set(JavaLanguageVersion.of(17));
 		});
 		project.getTasks().withType(JavaCompile.class)

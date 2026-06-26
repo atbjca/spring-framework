@@ -25,6 +25,10 @@ See the [Micro-Benchmarks](https://github.com/spring-projects/spring-framework/w
 
 See the [Build from Source](https://github.com/spring-projects/spring-framework/wiki/Build-from-Source) wiki page and the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
+## 本地维护（bjca-patch 分支）
+
+- [测试指南](doc/TESTING.md) — 环境配置、`make test` 用法与 TDD 流程
+
 ## Continuous Integration Builds
 
 CI builds are defined with [GitHub Actions workflows](.github/workflows).
