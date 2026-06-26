@@ -35,7 +35,7 @@
 - [x] 3.1 `Makefile` 增加 `build-thin`、`install`、`deploy`
 - [x] 3.2 `make build-thin` 验证通过
 - [x] 3.3 `make test` 全量回归（GAV 改动后须重跑；`spring-webflux` 偶发失败后重跑通过）
-- [ ] 3.4 `make install` 试装本地 Maven（可选）
+- [x] 3.4 `make install` 试装本地 Maven（可选）
 
 ## 4. 收尾
 
