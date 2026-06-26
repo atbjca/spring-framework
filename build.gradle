@@ -17,6 +17,25 @@ ext {
 	javaProjects = subprojects.findAll { !it.name.startsWith("framework-") }
 }
 
+// Nexus 发布：优先 Gradle property；Makefile 使用外置 GRADLE_USER_HOME 时回退 ~/.gradle/gradle.properties
+def loadUserHomeGradleProperty(String key) {
+	if (rootProject.hasProperty(key)) {
+		return rootProject.property(key)
+	}
+	def userPropsFile = new File(System.getProperty('user.home'), '.gradle/gradle.properties')
+	if (userPropsFile.exists()) {
+		def props = new Properties()
+		userPropsFile.withInputStream { props.load(it) }
+		return props.getProperty(key)
+	}
+	return null
+}
+
+ext.nexusSnapshotUrl = loadUserHomeGradleProperty('nexusSnapshotUrl')
+ext.nexusReleaseUrl = loadUserHomeGradleProperty('nexusReleaseUrl')
+ext.nexusUsername = loadUserHomeGradleProperty('nexusUsername')
+ext.nexusPassword = loadUserHomeGradleProperty('nexusPassword')
+
 description = "BJCA Footstone Bpring Framework"
 
 configure(allprojects) { project ->
