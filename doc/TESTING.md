@@ -50,15 +50,11 @@ sdk use java 17.0.17-amzn
 
 若 `~/dev/gradle-8.14.5` 不存在，`Makefile` 会自动回退到项目内 `./gradlew`（可能触发网络下载，较慢）。
 
-### 2.3 磁盘与缓存
+### 2.3 Gradle 缓存与 Nexus 配置
 
-编译、测试产生的依赖缓存与 Daemon 数据默认放在：
+Gradle 使用默认 **`~/.gradle`** 存放依赖缓存、Wrapper 分发包与 Daemon 数据。
 
-```
-~/Downloads/DELETE/tmp/gradle-home
-```
-
-可通过环境变量 `GRADLE_USER_HOME` 覆盖，避免占满系统盘。
+Nexus 发布凭证与仓库 URL 配置在 **`~/.gradle/gradle.properties`**（与 Spring Boot 2.7 NES 共用），`make deploy` 会自动读取。
 
 ---
 
@@ -78,9 +74,6 @@ sdk use java 17.0.17-amzn
 ```bash
 # 使用其他 JDK 路径
 JDK17=$HOME/.sdkman/candidates/java/17.0.12-oracle make test
-
-# 使用其他 Gradle 缓存目录
-GRADLE_USER_HOME=/path/to/cache make test
 ```
 
 ---
@@ -91,7 +84,6 @@ GRADLE_USER_HOME=/path/to/cache make test
 
 ```bash
 export JDK17="$HOME/.sdkman/candidates/java/17.0.17-amzn"
-export GRADLE_USER_HOME="$HOME/Downloads/DELETE/tmp/gradle-home"
 
 ~/dev/gradle-8.14.5/bin/gradle test \
   -Porg.gradle.java.installations.fromEnv=JDK17 \
@@ -221,7 +213,6 @@ unzip -q ~/dev/gradle-8.14.5-bin.zip -d ~/dev/
 ### Q4：磁盘空间不足
 
 ```bash
-export GRADLE_USER_HOME=~/Downloads/DELETE/tmp/gradle-home
 make clean
 make stop
 ```
@@ -246,7 +237,7 @@ make test-module M=spring-webflux
 |------|-----------------|--------|
 | JDK Toolchain Vendor | BellSoft Liberica | **Amazon Corretto** |
 | 本地构建入口 | `./gradlew` | **`Makefile`（`make test`）** |
-| Gradle 缓存 | 默认 `~/.gradle` | 默认 `~/Downloads/DELETE/tmp/gradle-home` |
+| Gradle 缓存 | 默认 `~/.gradle` | 默认 `~/.gradle` |
 
 ---
 

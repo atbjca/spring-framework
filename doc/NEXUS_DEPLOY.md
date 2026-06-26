@@ -2,8 +2,6 @@
 
 凭证与仓库地址配置在 **`~/.gradle/gradle.properties`**（与 Spring Boot 2.7 NES 共用）。
 
-> `make deploy` 使用外置 `GRADLE_USER_HOME` 时，构建脚本会自动回退读取 `~/.gradle/gradle.properties` 中的 Nexus 配置。
-
 ```properties
 nexusPublicUrl=http://192.168.131.36:8088/repository/maven-public/
 nexusReleaseUrl=http://192.168.131.36:8088/repository/releases/

@@ -7,17 +7,17 @@
 - `make test` — 全量测试
 - `make build-thin` — 编译打包（跳过测试）
 - `make install` — `publishToMavenLocal`
-- `make deploy` — `publish`（需 `deploymentRepository`）
+- `make deploy` — `publish` 至内网 Nexus（凭证见 `~/.gradle/gradle.properties`）
 
 #### Scenario: 默认使用 Corretto 17
 
 - **WHEN** 执行 `make test` 或 `make build-thin`
 - **THEN** 使用 `JDK17` 环境变量指向的 Amazon Corretto 17，并传递 `-Porg.gradle.java.installations.fromEnv=JDK17`
 
-#### Scenario: 缓存目录外置
+#### Scenario: 默认 Gradle 用户目录
 
-- **WHEN** 未覆盖 `GRADLE_USER_HOME`
-- **THEN** 默认使用 `~/Downloads/DELETE/tmp/gradle-home`，避免占满系统盘
+- **WHEN** 执行 `make test` 或 `make deploy`
+- **THEN** 使用默认 `~/.gradle` 作为 Gradle 缓存与全局配置目录（含 Nexus 凭证）
 
 ### Requirement: 验证门禁
 
