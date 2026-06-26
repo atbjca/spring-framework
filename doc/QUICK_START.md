@@ -37,10 +37,8 @@ dependencyManagement {
 
 ## 5. 发布到 Nexus（可选）
 
-在 `gradle.properties` 或命令行配置 `deploymentRepository` 后：
+见 [NEXUS_DEPLOY.md](NEXUS_DEPLOY.md)。配置 `~/.gradle/gradle.properties` 后：
 
 ```bash
 make deploy
 ```
-
-具体私服 URL 以公司 `~/.m2/settings.xml` 为准。

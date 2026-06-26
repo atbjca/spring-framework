@@ -109,3 +109,22 @@ configure([rootProject] + javaProjects) { project ->
 configure(moduleProjects) { project ->
 	apply from: "${rootDir}/gradle/spring-module.gradle"
 }
+
+// 配置全局发布仓库：NES 制品上传 Nexus（凭证与 URL 见 ~/.gradle/gradle.properties）
+allprojects {
+	plugins.withType(MavenPublishPlugin).all {
+		publishing {
+			repositories {
+				maven {
+					name = 'nexus'
+					url = project.version.toString().endsWith('-SNAPSHOT') ? nexusSnapshotUrl : nexusReleaseUrl
+					allowInsecureProtocol = true
+					credentials {
+						username = nexusUsername
+						password = nexusPassword
+					}
+				}
+			}
+		}
+	}
+}
