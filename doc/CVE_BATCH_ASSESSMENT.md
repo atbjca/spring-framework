@@ -1,8 +1,8 @@
-# CVE 批次评估报告（6.2.x Phase A）
+# CVE 批次评估报告（6.2.x Phase A → 核实关闭）
 
 > 评估范围：影响 Spring Framework 6.2.x 的安全公告（含 5.3 NES 矩阵中的 2025–2026 批次）  
 > 评估基线：`6.2.19-nes.patch.1-SNAPSHOT`  
-> 评估日期：2026-06-26
+> Phase A 日期：2026-06-26 | **核实关闭**：2026-06-29
 
 ## 1. 与 5.3 NES 矩阵的差异摘要
 
@@ -10,37 +10,39 @@
 |----------|----------|------|
 | 已 backport（Phase 2） | 基线已集成 | 6.2.19 官方已含 2024 年多数修复 |
 | 待修复 P0（41844/41853） | ✅ 上游已集成 | commit 已在 6.2.x 分支 |
-| 待修复 P1（SpEL/WebSocket 等） | 多数 ✅ 上游已集成 | 见下表 |
-| 待修复 P1（41254 STOMP） | ⏳ 仍待核实 | 未见专用修复 |
+| 待修复 P1（SpEL/WebSocket 等） | ✅ 上游已集成 | 见下表 |
+| 待修复 P1（41254 STOMP） | ✅ **核实已集成** | `c88bfc54c9`（6.2.12+） |
+| 待修复 P1（41842/41843） | ✅ **核实已集成** | `8d51f47357`（6.2.19） |
 
-## 2. 优先级矩阵（6.2 终稿）
+## 2. 优先级矩阵（6.2 终稿 — 2026-06-29 核实）
 
-| CVE | 描述 | 分级 | 6.2 状态 | 建议 |
-|-----|------|------|----------|------|
-| CVE-2025-41254 | STOMP CSRF | P1 | ⏳ 待核实 | 使用 STOMP 时建议 backport |
-| CVE-2026-41842 | 版本化静态资源 DoS | P1 | ⏳ 待核实 | 部分 commit `8d51f47357`，需 spike |
-| CVE-2026-41843 | 版本化静态资源路径穿越 | P1 | ⏳ 待核实 | 同上 |
-| CVE-2026-22737 | Script 视图路径 | P2 | ⏳ 待核实 | 按是否使用 Script 视图 |
-| CVE-2026-22741 | 静态资源缓存投毒 | P2 | ⏳ 待核实 | 低 CVSS，可延后 |
-| CVE-2026-22745 | Windows 静态资源 DoS | P2 | ⏳ 待核实 | 非 Windows 可延后 |
-| CVE-2026-41844 | 开放重定向 | — | ✅ 已集成 | 无需 action |
-| CVE-2026-41853 | Multipart 走私 | — | ✅ 已集成 | 无需 action |
-| CVE-2026-41841 | 缓存碰撞 | — | ✅ 已集成 | 无需 action |
-| CVE-2026-41838–41852 等 | 见 VULNERABILITY_FIXES | — | ✅ 已集成 | 无需 action |
+| CVE | 描述 | 分级 | 6.2 状态 | 官方 commit | 建议 |
+|-----|------|------|----------|-------------|------|
+| CVE-2025-41254 | STOMP CSRF | P1 | ✅ 已集成 | `c88bfc54c9` | 无需 action |
+| CVE-2026-41842 | 版本化静态资源 DoS | P1 | ✅ 已集成 | `8d51f47357` | 无需 action |
+| CVE-2026-41843 | 版本化静态资源路径穿越 | P1 | ✅ 已集成 | `8d51f47357` | 无需 action |
+| CVE-2026-22737 | Script 视图路径 | P2 | ✅ 已集成 | `317a1f9909` | 无需 action |
+| CVE-2026-22741 | 静态资源缓存投毒 | P2 | ✅ 已集成 | `e607f1c30f` | 无需 action |
+| CVE-2026-22745 | Windows 静态资源 DoS | P2 | ✅ 已集成 | `684b1e8a4b` | 无需 action |
+| CVE-2026-41844 | 开放重定向 | — | ✅ 已集成 | `3aaec98765` | 无需 action |
+| CVE-2026-41853 | Multipart 走私 | — | ✅ 已集成 | `696692f1` | 无需 action |
+| CVE-2026-41841 | 缓存碰撞 | — | ✅ 已集成 | `46867fad81` | 无需 action |
+| CVE-2026-41838–41852 等 | 见 VULNERABILITY_FIXES | — | ✅ 已集成 | 见该文档 | 无需 action |
 
-## 3. 待核实项说明
+## 3. 核实方法（2026-06-29 spike）
 
-### CVE-2025-41254（STOMP CSRF）
+### 共同步骤
 
-- **模块**: `StompSubProtocolHandler`
-- **判定**: 6.2 分支仅有状态管理重构（`c88bfc54c9`），**无明确 CSRF 防护 commit**
-- **建议**: 若下游使用 STOMP over WebSocket，单独立项 backport
+1. `git branch --contains <commit>` 确认修复 commit 在 `6.2.x-bjca-patch`
+2. 代码路径抽查（见 `openspec/changes/6.2-cve-verification-closeout/design.md`）
+3. 定向单元测试（exit 0）：
+   - `ContentBasedVersionStrategyTests.removeVersionOnlyOnce`（webmvc + webflux）
+   - `ResourceTests.isReadableChecksExistsFirst`（spring-core）
+   - `StompSubProtocolHandlerTests`（spring-websocket）
 
-### CVE-2026-41842/41843
+### Phase A 误判说明
 
-- **相关 commit**: `8d51f47357`（版本字符串移除策略）
-- **判定**: 与 advisory 完整修复是否一致 **待 spike**
-- **建议**: 对照官方 6.2.x security advisory 做 PoC 或测试移植
+Phase A 将 41254、41842/41843 标为「待核实」，因仅检索 commit message 关键词，未确认 **6.2.19 release 已合并** 对应官方补丁。Spike 后全部关闭。
 
 ## 4. 豁免 / 范围外
 
@@ -48,10 +50,11 @@
 |------|------|
 | CVE-2025-41248 | Spring Security 专属 |
 | CVE-2016-1000027 | 6.2 已移除 HttpInvoker |
-| 5.3 Phase 2 九个 CVE | 6.2.19 基线已覆盖，无需重复 backport |
+| 5.3 Phase 2 九个 CVE | 6.2.19 基线已覆盖 |
+| 5.3 仍缺的 P1/P2 | **属 5.3 NES 项目**，不在 6.2 fork 范围 |
 
 ## 5. 后续建议
 
-1. **OpenSpec + 审批**：CVE-2025-41254（若使用 STOMP）
-2. **Spike**：41842/41843 与官方补丁 diff
-3. **SCA 文档**：在扫描报告中引用本评估作豁免依据
+1. **SCA 报告**：引用本评估 + NES GAV 作豁免依据
+2. **5.3 NES**：若仍维护 5.3 线，需在 **5.3 仓库** 单独 backport（6.2 无需重复）
+3. **新 CVE**：按 OpenSpec 流程新建 change 评估

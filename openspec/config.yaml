@@ -7,8 +7,12 @@ context: |
   目标：NES 自维护 fork，GAV 重品牌以降低 SCA 误报，保持 org.springframework.* 包兼容
   命名：与 Spring Boot 2.7 NES 对齐（forkGroupIdBase / nes.patch 版本后缀）
   流程：OpenSpec 文档先行 → 审批 → 实施 → make test 验证 → 更新 doc/
+  范围铁律：本仓库仅处理 6.2.x-bjca-patch；其它版本/分支只可提醒对照，禁止在本项目内操作
 
 rules:
+  scope:
+    - 仅处理 6.2.x 相关内容；禁止在本仓库为 5.3/7.x/其它分支 backport、改代码、commit 或跑构建
+    - 跨版本需求须提醒用户去对应仓库，不得越界实施
   proposal:
     - 必须包含 Non-goals 章节
     - 必须说明与 Boot 2.7 NES 的属性对照（projectGroup / version / originalVersion）
