@@ -3,9 +3,9 @@
 凭证与仓库地址配置在 **`~/.gradle/gradle.properties`**（与 Spring Boot 2.7 NES 共用）。
 
 ```properties
-nexusPublicUrl=http://192.168.131.36:8088/repository/maven-public/
-nexusReleaseUrl=http://192.168.131.36:8088/repository/releases/
-nexusSnapshotUrl=http://192.168.131.36:8088/repository/snapshots/
+nexusPublicUrl=${NEXUS_PUBLIC_URL}
+nexusReleaseUrl=${NEXUS_RELEASE_URL}
+nexusSnapshotUrl=${NEXUS_SNAPSHOT_URL}
 nexusUsername=developer
 nexusPassword=***
 ```

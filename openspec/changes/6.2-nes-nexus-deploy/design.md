@@ -5,7 +5,7 @@
 | 分支 | `6.2.x-bjca-patch` |
 | 版本 | `6.2.19-nes.patch.1-SNAPSHOT` |
 | GAV | `cn.bjca.footstone.bpring:bjca-footstone-bpring-*` |
-| Nexus | `http://192.168.131.36:8088`（内网） |
+| Nexus | `${NEXUS_URL}`（内网） |
 | 参考 | 5.3 NES `spring-framework`、`spring-boot-2.7` NES |
 
 用户确认：**publish 必须走内网私服**；**resolve 不影响打包则不必改**。
