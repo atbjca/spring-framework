@@ -175,6 +175,13 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 		}
 
 		String simplePath = versionStrategy.removeVersion(requestPath, candidateVersion);
+		// CVE-2026-41843: Reject path traversal attempts in the resolved path
+		if (isInvalidPath(simplePath)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Rejected invalid path after version removal: " + simplePath);
+			}
+			return null;
+		}
 		Resource baseResource = chain.resolveResource(request, simplePath, locations);
 		if (baseResource == null) {
 			return null;
@@ -230,6 +237,18 @@ public class VersionResourceResolver extends AbstractResourceResolver {
 			return this.versionStrategyMap.get(matchingPatterns.get(0));
 		}
 		return null;
+	}
+
+	/**
+	 * Check if the path is invalid due to path traversal or other security concerns.
+	 * @param path the path to check
+	 * @return true if the path is invalid
+	 */
+	private static boolean isInvalidPath(String path) {
+		if (path.contains("../") || path.contains("..\\")) {
+			return true;
+		}
+		return false;
 	}
 
 

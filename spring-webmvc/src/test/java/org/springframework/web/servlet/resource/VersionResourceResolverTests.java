@@ -192,5 +192,35 @@ public class VersionResourceResolverTests {
 		assertThat(resolved).isEqualTo("/foo.css");
 	}
 
+	// CVE-2026-41843: Path traversal should be rejected after version removal
+	@Test
+	public void resolveResourcePathTraversalRejected() throws Exception {
+		String versionFile = "../etc/passwd-v1.2.3.css";
+		String version = "v1.2.3";
+		given(this.chain.resolveResource(null, versionFile, this.locations)).willReturn(null);
+		given(this.versionStrategy.extractVersion(versionFile)).willReturn(version);
+		given(this.versionStrategy.removeVersion(versionFile, version)).willReturn("../etc/passwd.css");
+
+		this.resolver.setStrategyMap(Collections.singletonMap("/**", this.versionStrategy));
+		Resource actual = this.resolver.resolveResourceInternal(null, versionFile, this.locations, this.chain);
+		// Should return null because path traversal is detected
+		assertThat(actual).isNull();
+	}
+
+	// CVE-2026-41843: Path traversal with encoded sequences
+	@Test
+	public void resolveResourcePathTraversalWithEncodedSeqRejected() throws Exception {
+		String versionFile = "static/..%2F..%2Fetc%2Fpasswd-v1.2.3.css";
+		String version = "v1.2.3";
+		given(this.chain.resolveResource(null, versionFile, this.locations)).willReturn(null);
+		given(this.versionStrategy.extractVersion(versionFile)).willReturn(version);
+		given(this.versionStrategy.removeVersion(versionFile, version)).willReturn("static/../../etc/passwd.css");
+
+		this.resolver.setStrategyMap(Collections.singletonMap("/**", this.versionStrategy));
+		Resource actual = this.resolver.resolveResourceInternal(null, versionFile, this.locations, this.chain);
+		// Should return null because path traversal is detected
+		assertThat(actual).isNull();
+	}
+
 
 }

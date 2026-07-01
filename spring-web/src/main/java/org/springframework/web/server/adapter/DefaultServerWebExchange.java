@@ -140,7 +140,9 @@ public class DefaultServerWebExchange implements ServerWebExchange {
 
 		try {
 			MediaType contentType = request.getHeaders().getContentType();
-			if (MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(contentType)) {
+			// 安全修复 (CVE-2026-41853)：通配 Content-Type 不解码为 form-data
+			if (contentType != null && contentType.isConcrete() &&
+					MediaType.APPLICATION_FORM_URLENCODED.isCompatibleWith(contentType)) {
 				return ((HttpMessageReader<MultiValueMap<String, String>>) configurer.getReaders().stream()
 						.filter(reader -> reader.canRead(FORM_DATA_TYPE, MediaType.APPLICATION_FORM_URLENCODED))
 						.findFirst()
@@ -162,7 +164,9 @@ public class DefaultServerWebExchange implements ServerWebExchange {
 
 		try {
 			MediaType contentType = request.getHeaders().getContentType();
-			if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(contentType)) {
+			// 安全修复 (CVE-2026-41853)：通配 Content-Type 不解码为 multipart
+			if (contentType != null && contentType.isConcrete() &&
+					MediaType.MULTIPART_FORM_DATA.isCompatibleWith(contentType)) {
 				return ((HttpMessageReader<MultiValueMap<String, Part>>) configurer.getReaders().stream()
 						.filter(reader -> reader.canRead(MULTIPART_DATA_TYPE, MediaType.MULTIPART_FORM_DATA))
 						.findFirst()

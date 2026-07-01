@@ -76,4 +76,13 @@ public class ContentBasedVersionStrategyTests {
 		assertThat(this.versionStrategy.addVersion("test/bar.css", "123")).isEqualTo("test/bar-123.css");
 	}
 
+	// CVE-2026-41842: Ensure only the last version occurrence is removed
+	@Test
+	public void removeVersionOnlyLastOccurrence() {
+		String hash = "abc123";
+		// Path with version string appearing twice - only last should be removed
+		String path = "v" + hash + "/css/v" + hash + "/app-" + hash + ".css";
+		assertThat(this.versionStrategy.removeVersion(path, hash)).isEqualTo("v" + hash + "/css/v" + hash + "/app.css");
+	}
+
 }

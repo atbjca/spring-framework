@@ -137,7 +137,14 @@ public abstract class AbstractVersionStrategy implements VersionStrategy {
 
 		@Override
 		public String removeVersion(String requestPath, String version) {
-			return StringUtils.delete(requestPath, "-" + version);
+			// CVE-2026-41842: Only remove the last occurrence of the version
+			// to avoid DoS when version strings appear multiple times in path
+			String toDelete = "-" + version;
+			int index = requestPath.lastIndexOf(toDelete);
+			if (index != -1) {
+				return requestPath.substring(0, index) + requestPath.substring(index + toDelete.length());
+			}
+			return requestPath;
 		}
 
 		@Override

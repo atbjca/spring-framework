@@ -170,6 +170,24 @@ public class CachingResourceResolverTests {
 		assertThat(this.chain.resolveResource(request, "bar.css", this.locations)).isSameAs(gzipped);
 	}
 
+	// CVE-2026-41841: Ensure normalized paths don't cause cache collisions
+	@Test
+	public void resolveResourceNoCacheCollisionNormalizedPaths() {
+		Resource expected = new ClassPathResource("test/bar.css", getClass());
+
+		// Resolve with normalized path first
+		Resource actual1 = this.chain.resolveResource(null, "bar.css", this.locations);
+		assertThat(actual1).isEqualTo(expected);
+
+		// Same resource with non-normalized path should use same cache entry
+		// and resolve correctly (not cause cache collision)
+		Resource actual2 = this.chain.resolveResource(null, "./bar.css", this.locations);
+		assertThat(actual2).isEqualTo(expected);
+
+		// Both paths should resolve to the same cached resource
+		assertThat(this.cache.get(resourceKey("bar.css"))).isNotNull();
+	}
+
 	private static String resourceKey(String key) {
 		return CachingResourceResolver.RESOLVED_RESOURCE_CACHE_KEY_PREFIX + key;
 	}

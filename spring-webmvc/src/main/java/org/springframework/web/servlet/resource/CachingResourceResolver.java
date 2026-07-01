@@ -128,13 +128,16 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 	}
 
 	protected String computeKey(@Nullable HttpServletRequest request, String requestPath) {
+		// CVE-2026-41841: Use a more robust cache key that normalizes the path
+		// to avoid cache collisions from equivalent paths
+		String normalizedPath = StringUtils.cleanPath(requestPath);
 		if (request != null) {
 			String codingKey = getContentCodingKey(request);
 			if (StringUtils.hasText(codingKey)) {
-				return RESOLVED_RESOURCE_CACHE_KEY_PREFIX + requestPath + "+encoding=" + codingKey;
+				return RESOLVED_RESOURCE_CACHE_KEY_PREFIX + normalizedPath + "+encoding=" + codingKey;
 			}
 		}
-		return RESOLVED_RESOURCE_CACHE_KEY_PREFIX + requestPath;
+		return RESOLVED_RESOURCE_CACHE_KEY_PREFIX + normalizedPath;
 	}
 
 	@Nullable

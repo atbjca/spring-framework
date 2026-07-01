@@ -49,3 +49,7 @@ atlassian-ide-plugin.xml
 .vscode/
 
 cached-antora-playbook.yml
+.claude/
+.codex/
+.cursor
+.apm

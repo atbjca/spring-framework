@@ -99,12 +99,11 @@ public class OperatorMatches extends Operator {
 		String regex = (String) right;
 
 		try {
-			Pattern pattern = this.patternCache.get(regex);
-			if (pattern == null) {
-				checkRegexLength(regex);
-				pattern = Pattern.compile(regex);
-				this.patternCache.putIfAbsent(regex, pattern);
-			}
+			// CVE-2026-41851: Use computeIfAbsent for thread-safe lazy initialization
+			Pattern pattern = this.patternCache.computeIfAbsent(regex, key -> {
+				checkRegexLength(key);
+				return Pattern.compile(key);
+			});
 			Matcher matcher = pattern.matcher(new MatcherInput(input, new AccessCount()));
 			return BooleanTypedValue.forValue(matcher.matches());
 		}

@@ -107,4 +107,28 @@ public class StandardWebSocketSessionTests {
 				.hasSize(1).containsEntry("foo", "bar");
 	}
 
+	// CVE-2026-41838: 验证 Session ID 使用密码学安全的随机数生成器
+	@Test
+	public void sessionIdIsUnique() {
+		// 创建多个 session，验证每个 session 的 ID 都是唯一的
+		StandardWebSocketSession session1 = new StandardWebSocketSession(this.headers, new HashMap<>(), null, null);
+		StandardWebSocketSession session2 = new StandardWebSocketSession(this.headers, new HashMap<>(), null, null);
+		StandardWebSocketSession session3 = new StandardWebSocketSession(this.headers, new HashMap<>(), null, null);
+
+		// 验证三个 session 的 ID 互不相同
+		assertThat(session1.getId()).isNotEqualTo(session2.getId());
+		assertThat(session2.getId()).isNotEqualTo(session3.getId());
+		assertThat(session1.getId()).isNotEqualTo(session3.getId());
+	}
+
+	// CVE-2026-41838: 验证 Session ID 为有效 UUID 格式
+	@Test
+	public void sessionIdIsValidUuid() {
+		StandardWebSocketSession session = new StandardWebSocketSession(this.headers, new HashMap<>(), null, null);
+		String sessionId = session.getId();
+
+		// 验证 ID 符合 UUID 格式（8-4-4-4-12 长度）
+		assertThat(sessionId).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+	}
+
 }

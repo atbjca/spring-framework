@@ -50,6 +50,7 @@ import org.springframework.web.reactive.HandlerResult;
 import org.springframework.web.reactive.accept.HeaderContentTypeResolver;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.server.NotAcceptableStatusException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.testfixture.http.server.reactive.MockServerHttpResponse;
 import org.springframework.web.testfixture.server.MockServerWebExchange;
@@ -210,6 +211,20 @@ public class ViewResolutionResultHandlerTests {
 		testDefaultViewName(Mono.empty(), on(Handler.class).resolveReturnType(Mono.class, String.class));
 		testDefaultViewName(Mono.empty(), on(Handler.class).resolveReturnType(Mono.class, Void.class));
 		testDefaultViewName(Completable.complete(), on(Handler.class).resolveReturnType(Completable.class));
+	}
+
+	@Test // CVE-2026-41844
+	public void defaultViewNameWithRedirectPrefixFails() {
+		MethodParameter returnType = on(Handler.class).resolveReturnType(Mono.class, String.class);
+		HandlerResult result = new HandlerResult(new Object(), Mono.empty(), returnType, this.bindingContext);
+		ViewResolutionResultHandler handler = resultHandler(new TestViewResolver("account"));
+
+		MockServerWebExchange exchange = MockServerWebExchange.from(get("/redirect:account"));
+		Mono<Void> mono = handler.handleResult(exchange, result);
+		StepVerifier.create(mono)
+				.expectNextCount(0)
+				.expectError(ResponseStatusException.class)
+				.verify();
 	}
 
 	private void testDefaultViewName(Object returnValue, MethodParameter returnType) {
