@@ -23,7 +23,6 @@ import org.springframework.lang.Nullable;
 
 /**
  * Configuration object for the SpEL expression parser.
- *
  * @author Juergen Hoeller
  * @author Phillip Webb
  * @author Andy Clement
@@ -34,7 +33,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Default maximum length permitted for a SpEL expression.
-	 * 
 	 * @since 5.2.24
 	 */
 	private static final int DEFAULT_MAX_EXPRESSION_LENGTH = 10_000;
@@ -75,7 +73,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Create a new {@code SpelParserConfiguration} instance.
-	 * 
 	 * @param compilerMode        the compiler mode for the parser
 	 * @param compilerClassLoader the ClassLoader to use as the basis for expression
 	 *                            compilation
@@ -86,7 +83,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Create a new {@code SpelParserConfiguration} instance.
-	 * 
 	 * @param autoGrowNullReferences if null references should automatically grow
 	 * @param autoGrowCollections    if collections should automatically grow
 	 * @see #SpelParserConfiguration(boolean, boolean, int)
@@ -97,7 +93,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Create a new {@code SpelParserConfiguration} instance.
-	 * 
 	 * @param autoGrowNullReferences if null references should automatically grow
 	 * @param autoGrowCollections    if collections should automatically grow
 	 * @param maximumAutoGrowSize    the maximum size that the collection can auto
@@ -110,7 +105,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Create a new {@code SpelParserConfiguration} instance.
-	 * 
 	 * @param compilerMode           the compiler mode that parsers using this
 	 *                               configuration object should use
 	 * @param compilerClassLoader    the ClassLoader to use as the basis for
@@ -129,7 +123,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Create a new {@code SpelParserConfiguration} instance.
-	 * 
 	 * @param compilerMode            the compiler mode that parsers using this
 	 *                                configuration object should use
 	 * @param compilerClassLoader     the ClassLoader to use as the basis for
@@ -192,7 +185,6 @@ public class SpelParserConfiguration {
 
 	/**
 	 * Return the maximum number of characters that a SpEL expression can contain.
-	 * 
 	 * @since 5.2.25
 	 */
 	public int getMaximumExpressionLength() {

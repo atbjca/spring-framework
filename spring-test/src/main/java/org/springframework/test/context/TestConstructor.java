@@ -67,7 +67,6 @@ import org.springframework.lang.Nullable;
  * As of Spring Framework 5.3, this annotation will be inherited from an
  * enclosing test class by default. See
  * {@link NestedTestConfiguration @NestedTestConfiguration} for details.
- *
  * @author Sam Brannen
  * @since 5.2
  * @see org.springframework.beans.factory.annotation.Autowired @Autowired
@@ -94,7 +93,7 @@ public @interface TestConstructor {
 	 * ignoring case. For example, the default may be changed to
 	 * {@link AutowireMode#ALL}
 	 * by supplying the following JVM system property via the command line.
-	 * 
+	 *
 	 * <pre style="code">
 	 * -Dspring.test.constructor.autowire.mode=all
 	 * </pre>
@@ -111,7 +110,6 @@ public @interface TestConstructor {
 	 * <a href=
 	 * "https://junit.org/junit5/docs/current/user-guide/#running-tests-config-params">JUnit
 	 * Platform configuration parameter</a>.
-	 * 
 	 * @see #autowireMode
 	 */
 	String TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME = "spring.test.constructor.autowire.mode";
@@ -123,7 +121,6 @@ public @interface TestConstructor {
 	 * Setting this flag overrides the global default. See
 	 * {@link #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME} for details on how
 	 * to change the global default.
-	 * 
 	 * @return an {@link AutowireMode} to take precedence over the global default
 	 * @see #TEST_CONSTRUCTOR_AUTOWIRE_MODE_PROPERTY_NAME
 	 * @see org.springframework.beans.factory.annotation.Autowired @Autowired
@@ -134,7 +131,6 @@ public @interface TestConstructor {
 
 	/**
 	 * Defines autowiring modes for parameters in a test constructor.
-	 * 
 	 * @see #ALL
 	 * @see #ANNOTATED
 	 */
@@ -144,7 +140,6 @@ public @interface TestConstructor {
 		 * All test constructor parameters will be autowired as if the constructor
 		 * itself were annotated with
 		 * {@link org.springframework.beans.factory.annotation.Autowired @Autowired}.
-		 * 
 		 * @see #ANNOTATED
 		 */
 		ALL,
@@ -156,7 +151,6 @@ public @interface TestConstructor {
 		 * {@link org.springframework.beans.factory.annotation.Qualifier @Qualifier},
 		 * or {@link org.springframework.beans.factory.annotation.Value @Value},
 		 * or if the constructor itself is annotated with {@code @Autowired}.
-		 * 
 		 * @see #ALL
 		 */
 		ANNOTATED;
@@ -164,7 +158,6 @@ public @interface TestConstructor {
 		/**
 		 * Get the {@code AutowireMode} enum constant with the supplied name,
 		 * ignoring case.
-		 * 
 		 * @param name the name of the enum constant to retrieve
 		 * @return the corresponding enum constant or {@code null} if not found
 		 * @since 5.3
@@ -177,7 +170,8 @@ public @interface TestConstructor {
 			}
 			try {
 				return AutowireMode.valueOf(name.trim().toUpperCase(Locale.ROOT));
-			} catch (IllegalArgumentException ex) {
+			}
+			catch (IllegalArgumentException ex) {
 				Log logger = LogFactory.getLog(AutowireMode.class);
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format("Failed to parse autowire mode from '%s': %s", name, ex.getMessage()));

@@ -24,9 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.lang.Nullable;
-import org.springframework.util.JdkIdGenerator;
 import org.springframework.util.Assert;
 import org.springframework.util.IdGenerator;
+import org.springframework.util.JdkIdGenerator;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PingMessage;
@@ -37,7 +37,6 @@ import org.springframework.web.socket.WebSocketSession;
 
 /**
  * An abstract base class for implementations of {@link WebSocketSession}.
- *
  * @author Rossen Stoyanchev
  * @since 4.0
  * @param <T> the native session type

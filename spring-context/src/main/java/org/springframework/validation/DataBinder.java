@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -93,7 +92,6 @@ import org.springframework.util.StringUtils;
  * javadoc states details on the default resolution rules.
  *
  * <p>This generic data binder can be used in any kind of environment.
- *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop

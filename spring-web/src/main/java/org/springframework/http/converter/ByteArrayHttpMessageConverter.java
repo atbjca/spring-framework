@@ -37,7 +37,6 @@ import org.springframework.util.StreamUtils;
  * can be
  * overridden by setting the {@link #setSupportedMediaTypes supportedMediaTypes}
  * property.
- *
  * @author Arjen Poutsma
  * @author Juergen Hoeller
  * @since 3.0
@@ -57,7 +56,6 @@ public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<
 	 * Set the maximum number of bytes that can be read into memory.
 	 * <p>
 	 * By default this is set to -1, which means no limit.
-	 * 
 	 * @since 5.3.42
 	 */
 	public void setMaxInMemorySize(int maxInMemorySize) {
@@ -66,7 +64,6 @@ public class ByteArrayHttpMessageConverter extends AbstractHttpMessageConverter<
 
 	/**
 	 * Return the maximum number of bytes that can be read into memory.
-	 * 
 	 * @since 5.3.42
 	 */
 	public int getMaxInMemorySize() {

@@ -25,7 +25,6 @@ import org.springframework.lang.Nullable;
 
 /**
  * Converts String to a Boolean.
- *
  * @author Keith Donald
  * @author Juergen Hoeller
  * @since 3.0
@@ -58,9 +57,11 @@ final class StringToBooleanConverter implements Converter<String, Boolean> {
 		value = value.toLowerCase(Locale.ROOT);
 		if (trueValues.contains(value)) {
 			return Boolean.TRUE;
-		} else if (falseValues.contains(value)) {
+		}
+		else if (falseValues.contains(value)) {
 			return Boolean.FALSE;
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException("Invalid boolean value '" + source + "'");
 		}
 	}

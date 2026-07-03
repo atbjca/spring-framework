@@ -93,7 +93,6 @@ import org.springframework.lang.Nullable;
  * <li>{@link org.springframework.test.context.jdbc.SqlMergeMode @SqlMergeMode}</li>
  * <li>{@link TestConstructor @TestConstructor}</li>
  * </ul>
- *
  * @author Sam Brannen
  * @since 5.3
  * @see EnclosingConfiguration#INHERIT
@@ -113,7 +112,7 @@ public @interface NestedTestConfiguration {
 	 * {@link EnclosingConfiguration}, ignoring case. For example, the default
 	 * may be changed to {@link EnclosingConfiguration#OVERRIDE} by supplying
 	 * the following JVM system property via the command line.
-	 * 
+	 *
 	 * <pre style="code">
 	 * -Dspring.test.enclosing.configuration=override
 	 * </pre>
@@ -125,14 +124,12 @@ public @interface NestedTestConfiguration {
 	 * May alternatively be configured via the
 	 * {@link org.springframework.core.SpringProperties SpringProperties}
 	 * mechanism.
-	 * 
 	 * @see #value
 	 */
 	String ENCLOSING_CONFIGURATION_PROPERTY_NAME = "spring.test.enclosing.configuration";
 
 	/**
 	 * Configures the {@link EnclosingConfiguration} mode.
-	 * 
 	 * @see EnclosingConfiguration#INHERIT
 	 * @see EnclosingConfiguration#OVERRIDE
 	 */
@@ -141,7 +138,6 @@ public @interface NestedTestConfiguration {
 	/**
 	 * Enumeration of <em>modes</em> that dictate how test configuration from
 	 * enclosing classes is processed for inner test classes.
-	 * 
 	 * @see #INHERIT
 	 * @see #OVERRIDE
 	 */
@@ -164,7 +160,6 @@ public @interface NestedTestConfiguration {
 		/**
 		 * Get the {@code EnclosingConfiguration} enum constant with the supplied
 		 * name, ignoring case.
-		 * 
 		 * @param name the name of the enum constant to retrieve
 		 * @return the corresponding enum constant or {@code null} if not found
 		 * @see EnclosingConfiguration#valueOf(String)
@@ -176,7 +171,8 @@ public @interface NestedTestConfiguration {
 			}
 			try {
 				return EnclosingConfiguration.valueOf(name.trim().toUpperCase(Locale.ROOT));
-			} catch (IllegalArgumentException ex) {
+			}
+			catch (IllegalArgumentException ex) {
 				Log logger = LogFactory.getLog(EnclosingConfiguration.class);
 				if (logger.isDebugEnabled()) {
 					logger.debug(String.format(

@@ -16,8 +16,6 @@
 
 package org.springframework.jms.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.jms.Session;
@@ -33,7 +31,6 @@ import org.springframework.util.StringUtils;
 
 /**
  * Parser for the JMS {@code <listener-container>} element.
- *
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @author Stephane Nicoll
@@ -70,9 +67,11 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 		String containerClass = containerEle.getAttribute(CONTAINER_CLASS_ATTRIBUTE);
 		if (StringUtils.hasLength(containerClass)) {
 			return null; // not supported
-		} else if (!StringUtils.hasLength(containerType) || containerType.startsWith("default")) {
+		}
+		else if (!StringUtils.hasLength(containerType) || containerType.startsWith("default")) {
 			factoryDef.setBeanClassName("org.springframework.jms.config.DefaultJmsListenerContainerFactory");
-		} else if (containerType.startsWith("simple")) {
+		}
+		else if (containerType.startsWith("simple")) {
 			factoryDef.setBeanClassName("org.springframework.jms.config.SimpleJmsListenerContainerFactory");
 		}
 
@@ -95,11 +94,14 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 		String containerClass = containerEle.getAttribute(CONTAINER_CLASS_ATTRIBUTE);
 		if (StringUtils.hasLength(containerClass)) {
 			containerDef.setBeanClassName(containerClass);
-		} else if (!StringUtils.hasLength(containerType) || containerType.startsWith("default")) {
+		}
+		else if (!StringUtils.hasLength(containerType) || containerType.startsWith("default")) {
 			containerDef.setBeanClassName("org.springframework.jms.listener.DefaultMessageListenerContainer");
-		} else if (containerType.startsWith("simple")) {
+		}
+		else if (containerType.startsWith("simple")) {
 			containerDef.setBeanClassName("org.springframework.jms.listener.SimpleMessageListenerContainer");
-		} else {
+		}
+		else {
 			parserContext.getReaderContext().error(
 					"Invalid 'container-type' attribute: only \"default\" and \"simple\" supported.", containerEle);
 		}
@@ -153,7 +155,8 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 									"Effective runtime behavior will be equivalent to \"consumer\" / \"auto\".",
 							containerEle);
 				}
-			} else {
+			}
+			else {
 				properties.add("cacheLevelName", "CACHE_" + cache.toUpperCase(Locale.ROOT));
 			}
 		}
@@ -162,7 +165,8 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 		if (acknowledgeMode != null) {
 			if (acknowledgeMode == Session.SESSION_TRANSACTED) {
 				properties.add("sessionTransacted", Boolean.TRUE);
-			} else {
+			}
+			else {
 				properties.add("sessionAcknowledgeMode", acknowledgeMode);
 			}
 		}
@@ -173,7 +177,8 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 				parserContext.getReaderContext().error(
 						"'transaction-manager' attribute not supported for listener container of type \"simple\".",
 						containerEle);
-			} else {
+			}
+			else {
 				properties.add("transactionManager", new RuntimeBeanReference(transactionManagerBeanName));
 			}
 		}
@@ -207,7 +212,8 @@ class JmsListenerContainerParser extends AbstractListenerContainerParser {
 			if (!isSimpleContainer) {
 				properties.add("backOff", new RuntimeBeanReference(backOffBeanName));
 			}
-		} else { // No need to consider this if back-off is set
+		}
+		else { // No need to consider this if back-off is set
 			String recoveryInterval = containerEle.getAttribute(RECOVERY_INTERVAL_ATTRIBUTE);
 			if (StringUtils.hasText(recoveryInterval)) {
 				if (!isSimpleContainer) {

@@ -35,7 +35,6 @@ import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
  * Lookup function used by {@link RouterFunctions#resources(String, Resource)}.
- *
  * @author Arjen Poutsma
  * @since 5.2
  */
@@ -72,10 +71,12 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 			Resource resource = this.location.createRelative(path);
 			if (resource.isReadable() && isResourceUnderLocation(resource)) {
 				return Optional.of(resource);
-			} else {
+			}
+			else {
 				return Optional.empty();
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			throw new UncheckedIOException(ex);
 		}
 	}
@@ -85,7 +86,8 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 		for (int i = 0; i < path.length(); i++) {
 			if (path.charAt(i) == '/') {
 				slash = true;
-			} else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
+			}
+			else if (path.charAt(i) > ' ' && path.charAt(i) != 127) {
 				if (i == 0 || (i == 1 && slash)) {
 					return normalizePath(path);
 				}
@@ -113,7 +115,8 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 	private static String decode(String path) {
 		try {
 			return java.net.URLDecoder.decode(path, "UTF-8");
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			return "";
 		}
 	}
@@ -142,13 +145,16 @@ class PathResourceLookupFunction implements Function<ServerRequest, Optional<Res
 		if (resource instanceof UrlResource) {
 			resourcePath = resource.getURL().toExternalForm();
 			locationPath = StringUtils.cleanPath(this.location.getURL().toString());
-		} else if (resource instanceof ClassPathResource) {
+		}
+		else if (resource instanceof ClassPathResource) {
 			resourcePath = ((ClassPathResource) resource).getPath();
 			locationPath = StringUtils.cleanPath(((ClassPathResource) this.location).getPath());
-		} else if (resource instanceof FileSystemResource) {
+		}
+		else if (resource instanceof FileSystemResource) {
 			resourcePath = StringUtils.cleanPath(((FileSystemResource) resource).getPath());
 			locationPath = StringUtils.cleanPath(((FileSystemResource) this.location).getPath());
-		} else {
+		}
+		else {
 			resourcePath = resource.getURL().getPath();
 			locationPath = StringUtils.cleanPath(this.location.getURL().getPath());
 		}

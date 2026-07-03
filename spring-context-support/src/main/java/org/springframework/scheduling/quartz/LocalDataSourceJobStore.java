@@ -64,7 +64,6 @@ import org.springframework.lang.Nullable;
  * Note that all Quartz Scheduler operations that affect the persistent
  * job store should usually be performed within active transactions,
  * as they assume to get proper locks etc.
- *
  * @author Juergen Hoeller
  * @since 1.1
  * @see SchedulerFactoryBean#setDataSource
@@ -80,7 +79,6 @@ public class LocalDataSourceJobStore extends JobStoreCMT {
 	/**
 	 * Name used for the transactional ConnectionProvider for Quartz.
 	 * This provider will delegate to the local Spring-managed DataSource.
-	 * 
 	 * @see org.quartz.utils.DBConnectionManager#addConnectionProvider
 	 * @see SchedulerFactoryBean#setDataSource
 	 */
@@ -89,7 +87,6 @@ public class LocalDataSourceJobStore extends JobStoreCMT {
 	/**
 	 * Name used for the non-transactional ConnectionProvider for Quartz.
 	 * This provider will delegate to the local Spring-managed DataSource.
-	 * 
 	 * @see org.quartz.utils.DBConnectionManager#addConnectionProvider
 	 * @see SchedulerFactoryBean#setDataSource
 	 */
@@ -170,7 +167,8 @@ public class LocalDataSourceJobStore extends JobStoreCMT {
 				setUseDBLocks(false);
 				setLockHandler(new SimpleSemaphore());
 			}
-		} catch (MetaDataAccessException ex) {
+		}
+		catch (MetaDataAccessException ex) {
 			logWarnIfNonZero(1, "Could not detect database type. Assuming locks can be taken.");
 		}
 

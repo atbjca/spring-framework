@@ -73,7 +73,6 @@ import static org.assertj.core.api.Assertions.entry;
 
 /**
  * Unit tests for {@link DataBinder}.
- *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Rob Harrop
@@ -818,13 +817,13 @@ class DataBinderTests {
 		DataBinder binder = new DataBinder(target, "target");
 		// Sigma: Σ (upper), σ (lower), ς (lower finishing)
 		// We use Σ in disallowed list and try to bind with σ
-		binder.setDisallowedFields("ΣIGMA"); 
+		binder.setDisallowedFields("ΣIGMA");
 		MutablePropertyValues pvs = new MutablePropertyValues();
 		pvs.add("σigma", "testValue");
 
 		binder.bind(pvs);
 		binder.close();
-		
+
 		// If working correctly, 'σigma' should be suppressed because ΣIGMA matches σigma
 		assertThat(target.get("σigma")).isNull();
 		assertThat(binder.getBindingResult().getSuppressedFields()).containsExactly("σigma");

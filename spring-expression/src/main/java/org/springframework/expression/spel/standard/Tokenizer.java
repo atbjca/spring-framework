@@ -27,7 +27,6 @@ import org.springframework.expression.spel.SpelParseException;
 
 /**
  * Lex some input data into a stream of tokens that can then be parsed.
- *
  * @author Andy Clement
  * @author Juergen Hoeller
  * @author Phillip Webb
@@ -87,12 +86,14 @@ class Tokenizer {
 			char ch = this.charsToProcess[this.pos];
 			if (isAlphabetic(ch)) {
 				lexIdentifier();
-			} else {
+			}
+			else {
 				switch (ch) {
 					case '+':
 						if (isTwoCharToken(TokenKind.INC)) {
 							pushPairToken(TokenKind.INC);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.PLUS);
 						}
 						break;
@@ -102,7 +103,8 @@ class Tokenizer {
 					case '-':
 						if (isTwoCharToken(TokenKind.DEC)) {
 							pushPairToken(TokenKind.DEC);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.MINUS);
 						}
 						break;
@@ -151,30 +153,35 @@ class Tokenizer {
 					case '^':
 						if (isTwoCharToken(TokenKind.SELECT_FIRST)) {
 							pushPairToken(TokenKind.SELECT_FIRST);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.POWER);
 						}
 						break;
 					case '!':
 						if (isTwoCharToken(TokenKind.NE)) {
 							pushPairToken(TokenKind.NE);
-						} else if (isTwoCharToken(TokenKind.PROJECT)) {
+						}
+						else if (isTwoCharToken(TokenKind.PROJECT)) {
 							pushPairToken(TokenKind.PROJECT);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.NOT);
 						}
 						break;
 					case '=':
 						if (isTwoCharToken(TokenKind.EQ)) {
 							pushPairToken(TokenKind.EQ);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.ASSIGN);
 						}
 						break;
 					case '&':
 						if (isTwoCharToken(TokenKind.SYMBOLIC_AND)) {
 							pushPairToken(TokenKind.SYMBOLIC_AND);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.FACTORY_BEAN_REF);
 						}
 						break;
@@ -187,32 +194,38 @@ class Tokenizer {
 					case '?':
 						if (isTwoCharToken(TokenKind.SELECT)) {
 							pushPairToken(TokenKind.SELECT);
-						} else if (isTwoCharToken(TokenKind.ELVIS)) {
+						}
+						else if (isTwoCharToken(TokenKind.ELVIS)) {
 							pushPairToken(TokenKind.ELVIS);
-						} else if (isTwoCharToken(TokenKind.SAFE_NAVI)) {
+						}
+						else if (isTwoCharToken(TokenKind.SAFE_NAVI)) {
 							pushPairToken(TokenKind.SAFE_NAVI);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.QMARK);
 						}
 						break;
 					case '$':
 						if (isTwoCharToken(TokenKind.SELECT_LAST)) {
 							pushPairToken(TokenKind.SELECT_LAST);
-						} else {
+						}
+						else {
 							lexIdentifier();
 						}
 						break;
 					case '>':
 						if (isTwoCharToken(TokenKind.GE)) {
 							pushPairToken(TokenKind.GE);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.GT);
 						}
 						break;
 					case '<':
 						if (isTwoCharToken(TokenKind.LE)) {
 							pushPairToken(TokenKind.LE);
-						} else {
+						}
+						else {
 							pushCharToken(TokenKind.LT);
 						}
 						break;
@@ -267,7 +280,8 @@ class Tokenizer {
 				// may not be the end if the char after is also a '
 				if (this.charsToProcess[this.pos + 1] == '\'') {
 					this.pos++; // skip over that too, and continue
-				} else {
+				}
+				else {
 					terminated = true;
 				}
 			}
@@ -290,7 +304,8 @@ class Tokenizer {
 				// may not be the end if the char after is also a "
 				if (this.charsToProcess[this.pos + 1] == '"') {
 					this.pos++; // skip over that too, and continue
-				} else {
+				}
+				else {
 					terminated = true;
 				}
 			}
@@ -334,7 +349,8 @@ class Tokenizer {
 			if (isChar('L', 'l')) {
 				pushHexIntToken(subarray(start + 2, this.pos), true, start, this.pos);
 				this.pos++;
-			} else {
+			}
+			else {
 				pushHexIntToken(subarray(start + 2, this.pos), false, start, this.pos);
 			}
 			return;
@@ -377,7 +393,8 @@ class Tokenizer {
 			}
 			pushIntToken(subarray(start, endOfNumber), true, start, endOfNumber);
 			this.pos++;
-		} else if (isExponentChar(this.charsToProcess[this.pos])) {
+		}
+		else if (isExponentChar(this.charsToProcess[this.pos])) {
 			isReal = true; // if it wasn't before, it is now
 			this.pos++;
 			char possibleSign = this.charsToProcess[this.pos];
@@ -393,24 +410,28 @@ class Tokenizer {
 			if (isFloatSuffix(this.charsToProcess[this.pos])) {
 				isFloat = true;
 				endOfNumber = ++this.pos;
-			} else if (isDoubleSuffix(this.charsToProcess[this.pos])) {
+			}
+			else if (isDoubleSuffix(this.charsToProcess[this.pos])) {
 				endOfNumber = ++this.pos;
 			}
 			pushRealToken(subarray(start, this.pos), isFloat, start, this.pos);
-		} else {
+		}
+		else {
 			ch = this.charsToProcess[this.pos];
 			boolean isFloat = false;
 			if (isFloatSuffix(ch)) {
 				isReal = true;
 				isFloat = true;
 				endOfNumber = ++this.pos;
-			} else if (isDoubleSuffix(ch)) {
+			}
+			else if (isDoubleSuffix(ch)) {
 				isReal = true;
 				endOfNumber = ++this.pos;
 			}
 			if (isReal) {
 				pushRealToken(subarray(start, endOfNumber), isFloat, start, endOfNumber);
-			} else {
+			}
+			else {
 				pushIntToken(subarray(start, endOfNumber), false, start, endOfNumber);
 			}
 		}
@@ -439,7 +460,8 @@ class Tokenizer {
 	private void pushIntToken(char[] data, boolean isLong, int start, int end) {
 		if (isLong) {
 			this.tokens.add(new Token(TokenKind.LITERAL_LONG, data, start, end));
-		} else {
+		}
+		else {
 			this.tokens.add(new Token(TokenKind.LITERAL_INT, data, start, end));
 		}
 	}
@@ -448,13 +470,15 @@ class Tokenizer {
 		if (data.length == 0) {
 			if (isLong) {
 				raiseParseException(start, SpelMessage.NOT_A_LONG, this.expressionString.substring(start, end + 1));
-			} else {
+			}
+			else {
 				raiseParseException(start, SpelMessage.NOT_AN_INTEGER, this.expressionString.substring(start, end));
 			}
 		}
 		if (isLong) {
 			this.tokens.add(new Token(TokenKind.LITERAL_HEXLONG, data, start, end));
-		} else {
+		}
+		else {
 			this.tokens.add(new Token(TokenKind.LITERAL_HEXINT, data, start, end));
 		}
 	}
@@ -462,7 +486,8 @@ class Tokenizer {
 	private void pushRealToken(char[] data, boolean isFloat, int start, int end) {
 		if (isFloat) {
 			this.tokens.add(new Token(TokenKind.LITERAL_REAL_FLOAT, data, start, end));
-		} else {
+		}
+		else {
 			this.tokens.add(new Token(TokenKind.LITERAL_REAL, data, start, end));
 		}
 	}

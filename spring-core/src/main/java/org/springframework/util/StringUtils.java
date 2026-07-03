@@ -16,7 +16,6 @@
 
 package org.springframework.util;
 
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -48,7 +47,6 @@ import org.springframework.lang.Nullable;
  * provided by the core Java {@link String} and {@link StringBuilder}
  * classes. It also provides easy-to-use methods to convert between
  * delimited strings, such as CSV strings, and collections and arrays.
- *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Keith Donald
@@ -789,7 +787,6 @@ public abstract class StringUtils {
 	 * 写入字节流后再按字符集解码，在某些不合规的 Servlet 容器环境中可能导致路径穿越风险。
 	 * 重构后的实现仅对连续的 %-encoded 字节序列执行字节解码，其余 ASCII 字符直接追加到
 	 * {@link StringBuilder}，行为更精确、更安全。
-	 *
 	 * @param source the encoded String
 	 * @param charset the character set
 	 * @return the decoded value
