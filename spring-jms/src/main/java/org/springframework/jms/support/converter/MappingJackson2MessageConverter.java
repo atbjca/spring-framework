@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -56,7 +59,6 @@ import org.springframework.util.ClassUtils;
  * </ul>
  *
  * <p>Compatible with Jackson 2.9 to 2.12, as of Spring 5.3.
- *
  * @author Mark Pollack
  * @author Dave Syer
  * @author Juergen Hoeller
@@ -90,6 +92,10 @@ public class MappingJackson2MessageConverter implements SmartMessageConverter, B
 
 	@Nullable
 	private ClassLoader beanClassLoader;
+
+	// CVE-2026-41855: 可信包白名单，限制可反序列化的类
+	@Nullable
+	private Set<String> trustedPackages;
 
 
 	@SuppressWarnings("deprecation")  // on Jackson 2.13: configure(MapperFeature, boolean)
@@ -173,6 +179,17 @@ public class MappingJackson2MessageConverter implements SmartMessageConverter, B
 	@Override
 	public void setBeanClassLoader(ClassLoader classLoader) {
 		this.beanClassLoader = classLoader;
+	}
+
+	/**
+	 * CVE-2026-41855: 设置可信包白名单，限制可通过类名反序列化的类.
+	 * <p>仅类名属于指定包（或其子包）的类允许反序列化。
+	 * 通过 {@link #setTypeIdMappings} 显式映射的类型不受此限制。
+	 * <p>传入 {@code "*"} 允许所有包（等同于未设置白名单）。
+	 * @param packages 可信包名列表
+	 */
+	public void setTrustedPackages(String... packages) {
+		this.trustedPackages = new LinkedHashSet<>(Arrays.asList(packages));
 	}
 
 
@@ -460,6 +477,13 @@ public class MappingJackson2MessageConverter implements SmartMessageConverter, B
 		if (mappedClass != null) {
 			return this.objectMapper.constructType(mappedClass);
 		}
+		// CVE-2026-41855: 校验类名是否在可信包白名单中
+		if (this.trustedPackages != null && !this.trustedPackages.contains("*")) {
+			if (!isTrustedPackage(typeId)) {
+				throw new MessageConversionException("Type id [" + typeId +
+						"] is not in the trusted packages: " + this.trustedPackages);
+			}
+		}
 		try {
 			Class<?> typeClass = ClassUtils.forName(typeId, this.beanClassLoader);
 			return this.objectMapper.constructType(typeClass);
@@ -467,6 +491,26 @@ public class MappingJackson2MessageConverter implements SmartMessageConverter, B
 		catch (Throwable ex) {
 			throw new MessageConversionException("Failed to resolve type id [" + typeId + "]", ex);
 		}
+	}
+
+	/**
+	 * CVE-2026-41855: 校验类名是否属于可信包（含子包）.
+	 */
+	private boolean isTrustedPackage(String className) {
+		if (this.trustedPackages == null) {
+			return true;
+		}
+		int lastDot = className.lastIndexOf('.');
+		if (lastDot < 0) {
+			return false;
+		}
+		String packageName = className.substring(0, lastDot);
+		for (String trusted : this.trustedPackages) {
+			if (packageName.equals(trusted) || packageName.startsWith(trusted + ".")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

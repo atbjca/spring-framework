@@ -89,6 +89,14 @@ public abstract class JavaScriptUtils {
 			else if (c == '\u2029') {
 				filtered.append("\\u2029");
 			}
+			// CVE-2026-41845: \u8f6c\u4e49\u53cd\u5f15\u53f7\uff0c\u9632\u6b62\u6a21\u677f\u5b57\u9762\u91cf\u6ce8\u5165
+			else if (c == '`') {
+				filtered.append("\\u0060");
+			}
+			// CVE-2026-41845: \u8f6c\u4e49\u7f8e\u5143\u7b26\u53f7\uff0c\u9632\u6b62\u6a21\u677f\u5b57\u9762\u91cf\u8868\u8fbe\u5f0f\u6ce8\u5165
+			else if (c == '$') {
+				filtered.append("\\u0024");
+			}
 			else {
 				filtered.append(c);
 			}

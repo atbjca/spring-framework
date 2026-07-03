@@ -193,7 +193,12 @@ public class GroovyMarkupConfigurer extends TemplateConfiguration
 	 * @see #setLocale
 	 */
 	protected URL resolveTemplate(ClassLoader classLoader, String templatePath) throws IOException {
-		MarkupTemplateEngine.TemplateResource resource = MarkupTemplateEngine.TemplateResource.parse(templatePath);
+		// CVE-2026-22737: 拒绝原始路径中的路径遍历（规范化前检测，防止 .. 被解析后绕过）
+		if (templatePath.contains("..")) {
+			throw new IOException("Invalid template path: path contains \"..\" [" + templatePath + "]");
+		}
+		String normalizedPath = StringUtils.cleanPath(templatePath);
+		MarkupTemplateEngine.TemplateResource resource = MarkupTemplateEngine.TemplateResource.parse(normalizedPath);
 		Locale locale = LocaleContextHolder.getLocale();
 		URL url = classLoader.getResource(resource.withLocale(StringUtils.replace(locale.toString(), "-", "_")).toString());
 		if (url == null) {

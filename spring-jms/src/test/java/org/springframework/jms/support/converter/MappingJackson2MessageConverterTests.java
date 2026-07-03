@@ -36,6 +36,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.core.MethodParameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
@@ -241,6 +242,88 @@ class MappingJackson2MessageConverterTests {
 		converter.toMessage(bean, sessionMock, Full.class);
 		verify(textMessageMock).setStringProperty("__typeid__", MyAnotherBean.class.getName());
 		verify(sessionMock).createTextMessage("{\"name\":\"test\",\"description\":\"lengthy description\"}");
+	}
+
+	// CVE-2026-41855: trustedPackages 白名单校验测试
+
+	@Test
+	void fromMessageWithTrustedPackage() throws Exception {
+		TextMessage textMessageMock = mock(TextMessage.class);
+
+		String text = "{\"foo\":\"bar\"}";
+		given(textMessageMock.getStringProperty("__typeid__")).willReturn(MyBean.class.getName());
+		given(textMessageMock.getText()).willReturn(text);
+
+		// 设置白名单包含测试类所在包
+		converter.setTrustedPackages("org.springframework.jms.support.converter");
+
+		MyBean result = (MyBean) converter.fromMessage(textMessageMock);
+		assertThat(result.getFoo()).isEqualTo("bar");
+	}
+
+	@Test
+	void fromMessageWithUntrustedPackageRejected() throws Exception {
+		TextMessage textMessageMock = mock(TextMessage.class);
+
+		given(textMessageMock.getStringProperty("__typeid__")).willReturn("com.evil.MaliciousClass");
+		given(textMessageMock.getJMSMessageID()).willReturn("msg-001");
+		given(textMessageMock.getJMSDestination()).willReturn(null);
+
+		// 仅信任特定包
+		converter.setTrustedPackages("org.springframework.jms");
+
+		assertThatExceptionOfType(MessageConversionException.class)
+				.isThrownBy(() -> converter.fromMessage(textMessageMock))
+				.withMessageContaining("not in the trusted packages");
+	}
+
+	@Test
+	void fromMessageWithMappedTypeBypassesTrustedPackages() throws Exception {
+		TextMessage textMessageMock = mock(TextMessage.class);
+
+		String text = "{\"foo\":\"bar\"}";
+		given(textMessageMock.getStringProperty("__typeid__")).willReturn("myBean");
+		given(textMessageMock.getText()).willReturn(text);
+
+		// 设置类型映射
+		Map<String, Class<?>> mappings = new HashMap<>();
+		mappings.put("myBean", MyBean.class);
+		converter.setTypeIdMappings(mappings);
+
+		// 设置白名单为空——通过映射的类型不需要白名单校验
+		converter.setTrustedPackages("java.lang");
+
+		MyBean result = (MyBean) converter.fromMessage(textMessageMock);
+		assertThat(result.getFoo()).isEqualTo("bar");
+	}
+
+	@Test
+	void fromMessageWithoutTrustedPackagesAllowsAll() throws Exception {
+		// 默认行为（未设置白名单）应允许所有类——向后兼容
+		TextMessage textMessageMock = mock(TextMessage.class);
+		MyBean unmarshalled = new MyBean("bar");
+
+		String text = "{\"foo\":\"bar\"}";
+		given(textMessageMock.getStringProperty("__typeid__")).willReturn(MyBean.class.getName());
+		given(textMessageMock.getText()).willReturn(text);
+
+		MyBean result = (MyBean) converter.fromMessage(textMessageMock);
+		assertThat(result).isEqualTo(unmarshalled);
+	}
+
+	@Test
+	void fromMessageWithWildcardTrustedPackage() throws Exception {
+		TextMessage textMessageMock = mock(TextMessage.class);
+
+		String text = "{\"foo\":\"bar\"}";
+		given(textMessageMock.getStringProperty("__typeid__")).willReturn(MyBean.class.getName());
+		given(textMessageMock.getText()).willReturn(text);
+
+		// 通配符 "*" 允许所有包
+		converter.setTrustedPackages("*");
+
+		MyBean result = (MyBean) converter.fromMessage(textMessageMock);
+		assertThat(result.getFoo()).isEqualTo("bar");
 	}
 
 

@@ -64,4 +64,14 @@ public class JavaScriptUtilsTests {
 		assertThat(JavaScriptUtils.javaScriptEscape("<>")).isEqualTo("\\u003C\\u003E");
 	}
 
+	// CVE-2026-41845: 反引号和美元符号必须转义，防止模板字面量 XSS
+	@Test
+	public void escapeBacktickAndDollarSign() {
+		assertThat(JavaScriptUtils.javaScriptEscape("`")).isEqualTo("\\u0060");
+		assertThat(JavaScriptUtils.javaScriptEscape("$")).isEqualTo("\\u0024");
+		assertThat(JavaScriptUtils.javaScriptEscape("${alert(1)}")).isEqualTo("\\u0024{alert(1)}");
+		assertThat(JavaScriptUtils.javaScriptEscape("`${document.cookie}`"))
+				.isEqualTo("\\u0060\\u0024{document.cookie}\\u0060");
+	}
+
 }

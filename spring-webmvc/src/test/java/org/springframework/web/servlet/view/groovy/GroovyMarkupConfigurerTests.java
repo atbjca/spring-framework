@@ -166,4 +166,20 @@ public class GroovyMarkupConfigurerTests {
 			this.configurer.resolveTemplate(getClass().getClassLoader(), TEMPLATE_PREFIX + "missing.tpl"));
 	}
 
+	// CVE-2026-22737: 路径遍历攻击必须被拒绝
+	@Test
+	public void rejectPathTraversal() {
+		assertThatIOException().isThrownBy(() ->
+				this.configurer.resolveTemplate(getClass().getClassLoader(), "../../../etc/passwd"))
+				.withMessageContaining("..");
+	}
+
+	@Test
+	public void rejectPathTraversalWithPrefix() {
+		assertThatIOException().isThrownBy(() ->
+				this.configurer.resolveTemplate(getClass().getClassLoader(),
+						TEMPLATE_PREFIX + "/../../../etc/passwd"))
+				.withMessageContaining("..");
+	}
+
 }
