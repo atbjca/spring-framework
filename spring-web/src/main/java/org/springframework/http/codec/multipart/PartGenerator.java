@@ -110,7 +110,10 @@ final class PartGenerator extends BaseSubscriber<MultipartParser.Token> {
 
 			sink.onCancel(generator::onSinkCancel);
 			sink.onRequest(l -> generator.requestToken());
-			tokens.subscribe(generator);
+			// CVE-2026-41840: 取消时释放 FluxSink 内部队列中缓冲的 BodyToken，防止 DataBuffer 泄漏
+			tokens.doOnDiscard(MultipartParser.BodyToken.class,
+					bodyToken -> DataBufferUtils.release(bodyToken.buffer()))
+					.subscribe(generator);
 		});
 	}
 
@@ -575,6 +578,12 @@ final class PartGenerator extends BaseSubscriber<MultipartParser.Token> {
 		public void body(DataBuffer dataBuffer) {
 			DataBufferUtils.release(dataBuffer);
 			emitError(new IllegalStateException("Body token not expected"));
+		}
+
+		// CVE-2026-22740: 创建临时文件期间阻止请求新 token，防止状态损坏和临时文件泄漏
+		@Override
+		public boolean canRequest() {
+			return false;
 		}
 
 		@Override

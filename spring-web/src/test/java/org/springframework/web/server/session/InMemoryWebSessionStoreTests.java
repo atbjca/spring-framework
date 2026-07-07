@@ -20,6 +20,10 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
@@ -164,6 +168,61 @@ public class InMemoryWebSessionStoreTests {
 		session.start();
 		session.save().block();
 		return session;
+	}
+
+	// CVE-2026-41839: 验证 changeSessionId() 正确更换 ID
+	@Test
+	public void changeSessionIdUpdatesSessionMap() {
+		WebSession session = insertSession();
+		String oldId = session.getId();
+
+		session.changeSessionId().block();
+
+		String newId = session.getId();
+		// 新旧 ID 不同
+		assertThat(newId).isNotEqualTo(oldId);
+		// 通过旧 ID 无法检索
+		assertThat(this.store.retrieveSession(oldId).block()).isNull();
+		// 通过新 ID 可以检索，且是同一 session
+		WebSession retrieved = this.store.retrieveSession(newId).block();
+		assertThat(retrieved).isNotNull();
+		assertThat(retrieved).isSameAs(session);
+	}
+
+	// CVE-2026-41839: 验证并发调用 changeSessionId() 不丢失 session
+	@Test
+	public void changeSessionIdConcurrently() throws Exception {
+		WebSession session = insertSession();
+
+		int threadCount = 10;
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		CountDownLatch latch = new CountDownLatch(threadCount);
+
+		// 多线程同时调用 changeSessionId
+		for (int i = 0; i < threadCount; i++) {
+			executor.submit(() -> {
+				try {
+					session.changeSessionId().block();
+				}
+				finally {
+					latch.countDown();
+				}
+			});
+		}
+
+		assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue();
+		executor.shutdown();
+
+		// 所有并发操作完成后，session 必须仍然可以通过当前 ID 检索到
+		String finalId = session.getId();
+		WebSession retrieved = this.store.retrieveSession(finalId).block();
+		assertThat(retrieved).isNotNull();
+		assertThat(retrieved).isSameAs(session);
+
+		// sessions map 中只有一个指向该 session 的条目
+		Map<String, WebSession> sessions = this.store.getSessions();
+		long count = sessions.values().stream().filter(s -> s == session).count();
+		assertThat(count).isEqualTo(1);
 	}
 
 }

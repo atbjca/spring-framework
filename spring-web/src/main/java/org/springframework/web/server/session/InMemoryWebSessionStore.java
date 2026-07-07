@@ -230,11 +230,14 @@ public class InMemoryWebSessionStore implements WebSessionStore {
 
 		@Override
 		public Mono<Void> changeSessionId() {
-			String currentId = this.id.get();
-			InMemoryWebSessionStore.this.sessions.remove(currentId);
-			String newId = String.valueOf(idGenerator.generateId());
-			this.id.set(newId);
-			InMemoryWebSessionStore.this.sessions.put(this.getId(), this);
+			// CVE-2026-41839: 同步保护，防止并发调用导致 session 丢失或 ID 不一致
+			synchronized (this) {
+				String currentId = this.id.get();
+				InMemoryWebSessionStore.this.sessions.remove(currentId);
+				String newId = String.valueOf(idGenerator.generateId());
+				this.id.set(newId);
+				InMemoryWebSessionStore.this.sessions.put(this.getId(), this);
+			}
 			return Mono.empty();
 		}
 
