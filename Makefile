@@ -3,6 +3,14 @@
 # Gradle 本地发行包配置脚本路径
 SETUP_GRADLE := ./scripts/setup-gradle-local.sh
 
+# 用真实 JDK 8 toolchain 编译 main，保证字节码与 JDK 8 运行时二进制兼容：
+#   - ByteBuffer 协变返回方法（position/limit/clear/flip）解析到 java.nio.Buffer 父类签名，
+#     避免 JDK 8 运行时 NoSuchMethodError（否则 DataBufferUtils 异步读会静默挂起）；
+#   - jdk.jfr（8u262+ backport）在真实 JDK 8 下可编译（--release 8 的历史 ct.sym 不含它）。
+# test 仍用 JDK 11（依赖 JDK 9+ API，如 InputStream.transferTo()）。
+# 需本机存在 JDK 8（Gradle 经 SDKMAN! 自动发现，如 8.0.472-amzn）。
+TOOLCHAINS := -PmainToolchain=8 -PtestToolchain=11
+
 help: ## 显示帮助信息
 	@echo ""
 	@echo "可用命令:"
@@ -31,18 +39,18 @@ clean: setup-gradle ## 清理构建产物
 	JAVA_HOME=$$(awk '/^java/ {print $$2}' ~/.sdkman/candidates/java/11.0.30-tem/release 2>/dev/null || echo "/Users/anan/.sdkman/candidates/java/11.0.30-tem") ./gradlew clean
 
 build: setup-gradle clean ## 编译打包（含 checkstyle + 测试）
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build
+	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build $(TOOLCHAINS)
 
 build-thin: setup-gradle clean ## 编译打包（瘦身版）
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x asciidoctor -x javadoc
+	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x asciidoctor -x javadoc
 
 # 编译并安装到本地 Maven 仓库（跳过测试和耗时的文档生成）
 install: setup-gradle
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publishToMavenLocal -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
+	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publishToMavenLocal $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 发布到 Nexus 私服（跳过测试和耗时的文档生成）
 deploy: setup-gradle
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publish -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
+	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publish $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 专门用于生成文档的命令（如果确实需要 API 文档时使用）
 docs: setup-gradle clean
