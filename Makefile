@@ -60,31 +60,31 @@ setup-gradle: ## 配置本地 Gradle 发行包（无需网络下载）
 	LOCAL_GRADLE_DIR="$(LOCAL_GRADLE_DIR)" UNPACK=1 "$(SETUP_GRADLE)"
 
 clean: setup-gradle ## 清理构建产物
-	JAVA_HOME=$$(awk '/^java/ {print $$2}' ~/.sdkman/candidates/java/11.0.30-tem/release 2>/dev/null || echo "/Users/anan/.sdkman/candidates/java/11.0.30-tem") ./gradlew clean
+	./gradlew clean
 
 build: setup-gradle clean ## 编译打包（含 checkstyle + 测试）
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build $(TOOLCHAINS)
+	./gradlew build $(TOOLCHAINS)
 
 build-thin: setup-gradle clean ## 编译打包（瘦身版）
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew build $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x asciidoctor -x javadoc
+	./gradlew build $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x asciidoctor -x javadoc
 
 # 编译并安装到本地 Maven 仓库（跳过测试和耗时的文档生成）
 install: setup-gradle
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publishToMavenLocal $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
+	./gradlew clean publishToMavenLocal $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 发布到 Nexus 私服（跳过测试和耗时的文档生成）
 deploy: setup-gradle
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew clean publish $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
+	./gradlew clean publish $(TOOLCHAINS) -x test -x checkstyleMain -x checkstyleTest -x checkstyleNohttp -x javadoc -x dokkaHtml -x dokkaHtmlPartial -x asciidoc -x asciidoctor -x asciidoctorPdf -x api
 
 # 专门用于生成文档的命令（如果确实需要 API 文档时使用）
 docs: setup-gradle clean
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew javadoc dokkaHtml asciidoctor
+	./gradlew javadoc dokkaHtml asciidoctor
 
 stop: ## 停止所有 Gradle Daemon
 	./gradlew --stop
 
 checkstyle: setup-gradle ## 运行 checkstyle 代码风格检查
-	JAVA_HOME=/Users/anan/.sdkman/candidates/java/11.0.30-tem ./gradlew checkstyleMain checkstyleTest -x test
+	./gradlew checkstyleMain checkstyleTest -x test
 
 format: ## 自动清理 Java 源文件行尾空格
 	@echo "清理 trailing whitespace..."
