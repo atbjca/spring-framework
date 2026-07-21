@@ -1,109 +1,147 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 安装本地 Gradle 发行包到 Gradle Wrapper 缓存（无需网络下载）。
+# 使用本地 Gradle 发行包预热 Gradle Wrapper 缓存（无需修改 Wrapper URL）。
 #
-# 工作原理：
-#   Gradle Wrapper 使用 PathAssembler 将 distributionUrl 映射到缓存目录。
-#   路径格式：~/.gradle/wrapper/dists/{distributionName}/{MD5(url) hash}/
-#   本脚本将本地 zip 复制到对应目录并解压，模拟 Gradle Wrapper 的首次下载。
+# Wrapper 配置是唯一事实来源：脚本读取 distributionUrl 和
+# distributionSha256Sum，只接受与 URL 文件名完全一致的本地 zip，并使用该
+# 官方 URL 计算 Wrapper 缓存目录。这样不同操作系统和用户目录会命中同一缓存身份。
 #
 # 用法：
-#   # 默认扫描 ~/dev/ 下的 gradle-*-zip
+#   # 默认在 ~/dev 查找 Wrapper 精确要求的 zip
 #   make setup-gradle
 #
-#   # 指定自定义目录
+#   # 指定本地发行包目录
 #   LOCAL_GRADLE_DIR=/path/to/zips make setup-gradle
+#
+# 找不到精确匹配时脚本退出成功，由 Gradle Wrapper 按配置的 HTTPS URL 下载。
 # =============================================================================
 set -euo pipefail
 
-# 允许外部覆盖 LOCAL_GRADLE_DIR（存放 zip 文件的目录）
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+WRAPPER_PROPERTIES="${WRAPPER_PROPERTIES:-${PROJECT_DIR}/gradle/wrapper/gradle-wrapper.properties}"
 LOCAL_GRADLE_DIR="${LOCAL_GRADLE_DIR:-${HOME}/dev}"
-# Gradle 用户主目录（允许外部覆盖）
 GRADLE_USER_HOME="${GRADLE_USER_HOME:-${HOME}/.gradle}"
-# 是否解压（1=解压，0=仅复制 zip）
 UNPACK="${UNPACK:-1}"
 
-# -----------------------------------------------------------------------------
-# 计算 Gradle Wrapper 使用的 MD5 hash
-# Gradle PathAssembler: MD5(url) as BigInteger -> base36
-# -----------------------------------------------------------------------------
+read_property() {
+	local key="$1"
+	local value
+	value="$(sed -n "s/^${key}=//p" "${WRAPPER_PROPERTIES}" | tail -n 1)"
+	# Gradle Wrapper properties commonly escape the URL scheme as https\://.
+	printf '%s\n' "${value}" | sed 's/\\:/:/g; s/\\=/=/g'
+}
+
 gradle_wrapper_hash() {
 	python3 - "$1" <<'PY'
-import hashlib, sys
-url = sys.argv[1]
-digest = hashlib.md5(url.encode()).digest()
-n = int.from_bytes(digest, "big")
+import hashlib
+import sys
+
+digest = hashlib.md5(sys.argv[1].encode()).digest()
+number = int.from_bytes(digest, "big")
 chars = "0123456789abcdefghijklmnopqrstuvwxyz"
-if n == 0:
-    print("0")
-    sys.exit(0)
-out = ""
-while n:
-    n, r = divmod(n, 36)
-    out = chars[r] + out
-print(out)
+result = ""
+while number:
+    number, remainder = divmod(number, 36)
+    result = chars[remainder] + result
+print(result or "0")
 PY
 }
 
-# -----------------------------------------------------------------------------
-# 安装单个 zip 到 Gradle Wrapper 缓存
-# -----------------------------------------------------------------------------
-install_zip() {
-	local zip_file="$1"
-	local base name version dist_type dist_name url hash dest extracted ok_marker
+file_sha256() {
+	python3 - "$1" <<'PY'
+import hashlib
+import sys
 
-	base="$(basename "${zip_file}")"
-	# 匹配 gradle-{version}-{bin|all}.zip
-	if [[ ! "${base}" =~ ^gradle-(.+)-(bin|all)\.zip$ ]]; then
-		echo "跳过（文件名不匹配 gradle-*-{bin,all}.zip）: ${base}" >&2
-		return 0
-	fi
-	version="${BASH_REMATCH[1]}"
-	dist_type="${BASH_REMATCH[2]}"
-	dist_name="gradle-${version}-${dist_type}"
-	# 构建 distributionUrl（与 gradle-wrapper.properties 中的格式保持一致）
-	url="file://${zip_file}"
-	hash="$(gradle_wrapper_hash "${url}")"
-	dest="${GRADLE_USER_HOME}/wrapper/dists/${dist_name}/${hash}"
-	extracted="${dest}/gradle-${version}"
-	ok_marker="${dest}/${dist_name}.zip.ok"
-
-	# 已安装完成则跳过
-	if [[ -f "${ok_marker}" && -d "${extracted}" ]]; then
-		echo "已就绪: ${dist_name} (${hash})"
-		return 0
-	fi
-
-	mkdir -p "${dest}"
-	# 清理可能的残留锁文件
-	rm -f "${dest}/${dist_name}.zip.part" "${dest}/${dist_name}.zip.lck"
-	# 复制 zip 到目标目录
-	cp "${zip_file}" "${dest}/${dist_name}.zip"
-
-	if [[ "${UNPACK}" == "1" ]]; then
-		echo "解压: ${base} -> ${dest}"
-		unzip -q -o "${dest}/${dist_name}.zip" -d "${dest}"
-		touch "${ok_marker}"
-	else
-		echo "已复制 zip（未解压）: ${base} -> ${dest}"
-	fi
+digest = hashlib.sha256()
+with open(sys.argv[1], "rb") as archive:
+    for chunk in iter(lambda: archive.read(1024 * 1024), b""):
+        digest.update(chunk)
+print(digest.hexdigest())
+PY
 }
 
-# -----------------------------------------------------------------------------
-# 主流程
-# -----------------------------------------------------------------------------
-shopt -s nullglob
-zips=("${LOCAL_GRADLE_DIR}"/gradle-*-bin.zip "${LOCAL_GRADLE_DIR}"/gradle-*-all.zip)
+if [[ ! -f "${WRAPPER_PROPERTIES}" ]]; then
+	echo "Gradle Wrapper 配置不存在: ${WRAPPER_PROPERTIES}" >&2
+	exit 1
+fi
 
-if [[ ${#zips[@]} -eq 0 ]]; then
-	echo "未在 ${LOCAL_GRADLE_DIR} 找到 gradle-*-{bin,all}.zip" >&2
-	echo "可将发行包放到该目录，或设置 LOCAL_GRADLE_DIR" >&2
-	echo "跳过本地 Gradle 安装：Wrapper 将按官方 distributionUrl 联网下载。" >&2
+distribution_url="$(read_property distributionUrl)"
+expected_sha256="$(read_property distributionSha256Sum | tr 'A-F' 'a-f')"
+
+if [[ -z "${distribution_url}" ]]; then
+	echo "Gradle Wrapper 配置缺少 distributionUrl: ${WRAPPER_PROPERTIES}" >&2
+	exit 1
+fi
+if [[ ! "${distribution_url}" =~ ^https:// ]]; then
+	echo "distributionUrl 必须是可移植的 HTTPS URL: ${distribution_url}" >&2
+	exit 1
+fi
+if [[ ! "${expected_sha256}" =~ ^[0-9a-f]{64}$ ]]; then
+	echo "Gradle Wrapper 配置缺少有效的 distributionSha256Sum" >&2
+	exit 1
+fi
+if [[ "${UNPACK}" != "0" && "${UNPACK}" != "1" ]]; then
+	echo "UNPACK 只能是 0 或 1，当前值: ${UNPACK}" >&2
+	exit 1
+fi
+
+archive_name="${distribution_url##*/}"
+case "${archive_name}" in
+	gradle-*-bin.zip|gradle-*-all.zip) ;;
+	*)
+		echo "无法从 distributionUrl 识别 Gradle 发行包: ${distribution_url}" >&2
+		exit 1
+		;;
+esac
+
+dist_name="${archive_name%.zip}"
+version_and_type="${dist_name#gradle-}"
+version="${version_and_type%-bin}"
+version="${version%-all}"
+hash="$(gradle_wrapper_hash "${distribution_url}")"
+dest="${GRADLE_USER_HOME}/wrapper/dists/${dist_name}/${hash}"
+extracted="${dest}/gradle-${version}"
+ok_marker="${dest}/${archive_name}.ok"
+cached_archive="${dest}/${archive_name}"
+local_archive="${LOCAL_GRADLE_DIR}/${archive_name}"
+
+if [[ -f "${ok_marker}" && -d "${extracted}" ]]; then
+	echo "已就绪: ${dist_name} (${hash})"
 	exit 0
 fi
 
-echo "扫描 ${LOCAL_GRADLE_DIR}，共 ${#zips[@]} 个 Gradle 发行包..."
-for zip_file in "${zips[@]}"; do
-	install_zip "${zip_file}"
-done
-echo "完成。"
+if [[ ! -f "${local_archive}" ]]; then
+	echo "未在 ${LOCAL_GRADLE_DIR} 找到 Wrapper 要求的 ${archive_name}" >&2
+	shopt -s nullglob
+	other_archives=("${LOCAL_GRADLE_DIR}"/gradle-*-bin.zip "${LOCAL_GRADLE_DIR}"/gradle-*-all.zip)
+	if [[ ${#other_archives[@]} -gt 0 ]]; then
+		echo "检测到其它 Gradle 发行包（不会用于替代 ${archive_name}）:" >&2
+		for other_archive in "${other_archives[@]}"; do
+			echo "  - $(basename "${other_archive}")" >&2
+		done
+	fi
+	echo "跳过本地缓存预热：Gradle Wrapper 将按 ${distribution_url} 下载。" >&2
+	exit 0
+fi
+
+actual_sha256="$(file_sha256 "${local_archive}")"
+if [[ "${actual_sha256}" != "${expected_sha256}" ]]; then
+	echo "Gradle 发行包 SHA-256 校验失败: ${local_archive}" >&2
+	echo "期望: ${expected_sha256}" >&2
+	echo "实际: ${actual_sha256}" >&2
+	exit 1
+fi
+
+mkdir -p "${dest}"
+rm -f "${cached_archive}.part" "${cached_archive}.lck"
+cp "${local_archive}" "${cached_archive}"
+
+if [[ "${UNPACK}" == "1" ]]; then
+	echo "解压: ${archive_name} -> ${dest}"
+	unzip -q -o "${cached_archive}" -d "${dest}"
+	touch "${ok_marker}"
+	echo "已就绪: ${dist_name} (${hash})"
+else
+	echo "已校验并复制（未解压）: ${archive_name} -> ${dest}"
+fi
