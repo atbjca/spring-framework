@@ -27,6 +27,14 @@ See the [Build from Source](https://github.com/spring-projects/spring-framework/
 
 ## 本地维护（bjca-patch / NES 6.2）
 
+- 当前 RELEASE：`6.2.19-nes.patch.1`
+- BOM：`cn.bjca.footstone.bpring:bjca-footstone-bpring-framework-bom:6.2.19-nes.patch.1`
+- 代表制品：`cn.bjca.footstone.bpring:bjca-footstone-bpring-core:6.2.19-nes.patch.1`
+- 完整发布集：23 个 `bjca-footstone-bpring-*` 模块、BOM，以及 `spring:framework-api`、`spring:framework-docs`，共 26 个 GAV
+- 内部前置 RELEASE：无；发布排除项：无
+- 本地发布门禁：复用可审计的开发构建/测试证据；现场执行 `make install`、生成 POM 扫描及最小本地消费者验证
+- Nexus 仓库：用户级 `nexusReleaseUrl` 配置指向的 RELEASE 仓库；凭证仅保存在 `~/.gradle/gradle.properties`
+- 约束：`Implementation-Version` 保持上游基线 `6.2.19`；Nexus RELEASE 不可覆盖或重复发布
 - [OpenSpec: 6.2 NES GAV 重品牌](openspec/changes/archive/2026-07-27-6.2-nes-gav-rebrand/proposal.md)
 - [OpenSpec: 6.2 CVE 评估](openspec/changes/archive/2026-07-27-6.2-cve-assessment/proposal.md)
 - [业务需求](doc/REQUIREMENTS.md)

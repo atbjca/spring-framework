@@ -29,7 +29,18 @@
 | `org.springframework` | `spring-websocket` | `6.2.19` | `cn.bjca.footstone.bpring` | `bjca-footstone-bpring-websocket` | `6.2.19-nes.patch.1` |
 | `org.springframework` | `spring-framework-bom` | `6.2.19` | `cn.bjca.footstone.bpring` | `bjca-footstone-bpring-framework-bom` | `6.2.19-nes.patch.1` |
 
-开发阶段可使用 `6.2.19-nes.patch.1-SNAPSHOT`。
+当前正式版本为 `6.2.19-nes.patch.1`。本组件没有内部 `cn.bjca.footstone` 前置 RELEASE，也没有发布排除项。开发阶段构建/测试证据经提交祖先和中间 diff 审核后复用；现场门禁为 `make install`、生成 POM 扫描和仅使用本地 RELEASE 制品的消费者验证。发布目标为用户级 `nexusReleaseUrl` 指定的 Nexus RELEASE 仓库。
+
+所有替换后制品共享上表版本；JAR manifest 的 `Implementation-Version` 刻意保持上游基线 `6.2.19`。Nexus RELEASE 不可覆盖或重复发布。
+
+`make install` / `make deploy` 还会生成两个不参与业务 GAV 替换的辅助 publication：
+
+| GroupId | ArtifactId | Version | 内容 |
+| --- | --- | --- | --- |
+| `spring` | `framework-api` | `6.2.19-nes.patch.1` | 聚合 API 文档与 schema ZIP |
+| `spring` | `framework-docs` | `6.2.19-nes.patch.1` | 文档 publication POM |
+
+因此完整发布集为 23 个 NES 模块、1 个 BOM 和 2 个辅助 publication，共 26 个 GAV。
 
 **BOM 示例（Gradle）：**
 
