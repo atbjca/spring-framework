@@ -12,6 +12,24 @@ This project is governed by the [Spring Code of Conduct](CODE_OF_CONDUCT.adoc). 
 
 For access to artifacts or a distribution zip, see the [Spring Framework Artifacts](https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-Artifacts) wiki page.
 
+### NES RELEASE
+
+The NES build publishes Spring Framework 5.3.39 as version
+`5.3.39-nes.patch.1` under group `cn.bjca.footstone.bpring`. For example:
+
+```text
+cn.bjca.footstone.bpring:bjca-footstone-bpring-core:5.3.39-nes.patch.1
+```
+
+The complete coordinate mapping is in [doc/GAV_MAPPING.md](doc/GAV_MAPPING.md).
+This release has no internal `cn.bjca.footstone` upstream dependency and no
+excluded publication. Before Nexus deployment, validate it locally with
+`make build`, `make test`, and `make install`; all generated POMs must be free
+of internal `-SNAPSHOT` references. RELEASE artifacts are published to the
+configured Nexus releases repository (browse endpoint:
+`http://192.168.131.36:8088/#browse/browse:releases`). Credentials remain in
+the user-level Gradle configuration and are not stored in this repository.
+
 ## Documentation
 
 The Spring Framework maintains reference documentation ([published](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/) and [source](src/docs/asciidoc)), GitHub [wiki pages](https://github.com/spring-projects/spring-framework/wiki), and an

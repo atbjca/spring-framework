@@ -19,7 +19,7 @@
 ## 具体改动
 - groupId 统一改为：`cn.bjca.footstone.bpring`
 - artifactId 统一前缀：`bjca-footstone-bpring-` + 去掉原`spring-`前缀的首字母小写（例如：`spring-core` → `bjca-footstone-bpring-core`，`spring-framework-bom` → `bjca-footstone-bpring-framework-bom`）
-- version：原版号 + `-bjca-patched.1`（例如 `5.3.39-bjca-patched.1`）
+- version：原版号 + `-nes.patch.N`（例如本次 RELEASE 为 `5.3.39-nes.patch.1`）
 
 ## 关键约束
 1. 只涉及构建脚本GAV层面的修改，绝对保持Java层兼容性。
