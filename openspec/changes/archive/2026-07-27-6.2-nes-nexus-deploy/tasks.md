@@ -26,14 +26,21 @@
 ## 3. Phase C — 验证门禁
 
 - [x] 3.1 `make deploy` → BUILD SUCCESSFUL（改回 `~/.gradle` 后，2026-06-26 验证）
-- [ ] 3.2 Nexus UI 抽查 `bjca-footstone-bpring-core` 与 `framework-bom`
+- [x] 3.2 Nexus 抽查 `bjca-footstone-bpring-core` 与 `framework-bom`（2026-07-27 匿名 metadata HTTP 200；snapshot build 2）
 - [x] 3.3 `make install` 本地试装（GAV change 已验证）
 
 ## 4. 收尾
 
 - [x] 4.1 **【需审批后】** commit（OpenSpec + 文档 + Makefile）
-- [ ] 4.2 通知下游 Boot 线配置 Nexus snapshots 依赖
-- [ ] 4.3 OpenSpec change 归档
+- [x] 4.2 通知下游 Boot 线配置 Nexus 依赖（2026-07-27 已通知中央 RELEASE train）
+- [x] 4.3 OpenSpec change 归档
+
+## 2026-07-27 归档复核
+
+- `cn.bjca.footstone.bpring:bjca-footstone-bpring-core:6.2.19-nes.patch.1-SNAPSHOT` 的 `maven-metadata.xml`：匿名只读 HTTP 200
+- `cn.bjca.footstone.bpring:bjca-footstone-bpring-framework-bom:6.2.19-nes.patch.1-SNAPSHOT` 的 `maven-metadata.xml`：匿名只读 HTTP 200
+- 两项 metadata 均记录 `lastUpdated=20260626111027`、`timestamp=20260626.111027`、`buildNumber=2`
+- 本次复核未执行 deploy，未读取或记录任何凭证值
 
 ## 不在本 change 内
 

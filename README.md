@@ -27,8 +27,8 @@ See the [Build from Source](https://github.com/spring-projects/spring-framework/
 
 ## 本地维护（bjca-patch / NES 6.2）
 
-- [OpenSpec: 6.2 NES GAV 重品牌](openspec/changes/6.2-nes-gav-rebrand/proposal.md)
-- [OpenSpec: 6.2 CVE 评估](openspec/changes/6.2-cve-assessment/proposal.md)
+- [OpenSpec: 6.2 NES GAV 重品牌](openspec/changes/archive/2026-07-27-6.2-nes-gav-rebrand/proposal.md)
+- [OpenSpec: 6.2 CVE 评估](openspec/changes/archive/2026-07-27-6.2-cve-assessment/proposal.md)
 - [业务需求](doc/REQUIREMENTS.md)
 - [GAV 映射表](doc/GAV_MAPPING.md)
 - [漏洞总览](doc/VULNERABILITY_FIXES.md)

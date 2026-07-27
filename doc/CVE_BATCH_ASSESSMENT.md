@@ -34,7 +34,7 @@
 ### 共同步骤
 
 1. `git branch --contains <commit>` 确认修复 commit 在 `6.2.x-bjca-patch`
-2. 代码路径抽查（见 `openspec/changes/6.2-cve-verification-closeout/design.md`）
+2. 代码路径抽查（见 `openspec/changes/archive/2026-07-27-6.2-cve-verification-closeout/design.md`）
 3. 定向单元测试（exit 0）：
    - `ContentBasedVersionStrategyTests.removeVersionOnlyOnce`（webmvc + webflux）
    - `ResourceTests.isReadableChecksExistsFirst`（spring-core）

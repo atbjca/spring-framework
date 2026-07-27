@@ -57,7 +57,7 @@ gradle clean publish -x test -x javadoc -x dokkaHtml -x dokkaHtmlPartial
 
 ### Requirement: 依赖解析不在范围
 
-本 capability **不要求** 在 `settings.gradle` 或 `build.gradle` 的 `repositories` 中配置 Nexus。构建 MAY 继续从 mavenCentral / repo.spring.io 解析依赖。
+本 capability MUST NOT 要求在 `settings.gradle` 或 `build.gradle` 的 `repositories` 中配置 Nexus。构建 MAY 继续从 mavenCentral / repo.spring.io 解析依赖。
 
 #### Scenario: 外网依赖解析不影响发布
 

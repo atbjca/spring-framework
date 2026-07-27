@@ -30,7 +30,7 @@
 
 ## 相关文档
 
-- [OpenSpec 变更提案](../openspec/changes/6.2-nes-gav-rebrand/proposal.md)（**须先审批再实施**）
+- [OpenSpec 变更提案](../openspec/changes/archive/2026-07-27-6.2-nes-gav-rebrand/proposal.md)（已实施并归档）
 - [GAV 映射表](GAV_MAPPING.md)
 - [GroupId 维护](GROUP_ID_MAINTENANCE.md)
 - [快速入门](QUICK_START.md)

@@ -40,8 +40,8 @@
 ## 4. 收尾
 
 - [x] 4.1 **【需审批】** commit（OpenSpec + 实施改动）
-- [ ] 4.2 通知下游更新 `springFrameworkVersion`（Boot 线）
-- [ ] 4.3 OpenSpec change 归档（`/opsx:archive`）
+- [x] 4.2 通知下游更新 `springFrameworkVersion`（Boot 线；2026-07-27 已通知中央 RELEASE train）
+- [x] 4.3 OpenSpec change 归档（`/opsx:archive`）
 
 ## 后续 change（不在本任务内）
 
